@@ -3,6 +3,7 @@ import InputBase from "@mui/material/InputBase";
 import IconButton from "@mui/material/IconButton";
 import SearchIcon from "@mui/icons-material/Search";
 import { styled } from "@mui/material/styles";
+import { useState } from "react";
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
     color: "#E6E6EB", // Set text color
@@ -13,8 +14,17 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 const SearchBar = () => {
+    const [query, setQuery] = useState<string>("");
+
+    const handleSubmit = (event: React.FormEvent) => {
+        event.preventDefault();
+        if (query.trim()) {
+            window.location.href = `/search?q=${encodeURIComponent(query)}`;
+        }
+    };
     return (
         <Paper
+            onSubmit={handleSubmit}
             component="form"
             sx={{
                 p: "2px 4px",
@@ -36,6 +46,7 @@ const SearchBar = () => {
                 }}
                 placeholder="Search..."
                 inputProps={{ "aria-label": "search" }}
+                onChange={(e) => setQuery(e.target.value)}
             />
             <IconButton
                 type="submit"
