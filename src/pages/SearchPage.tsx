@@ -3,6 +3,7 @@ import { NavLink, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getSearchArtist } from "../api/last.fm/searchArtist";
 import type { SearchArtistT } from "../api/last.fm/searchArtist";
+import SimilarArtistsPicture from "../components/Artist Page/SimilarArtistsPicture";
 
 const SearchPage = () => {
     const [searchParams] = useSearchParams();
@@ -24,7 +25,7 @@ const SearchPage = () => {
                 </h2>
 
                 {data && (
-                    <ul className="grid grid-cols-7 gap-10 mt-3 text-whiteMain font-poppins ">
+                    <ul className="grid grid-cols-8 gap-5  mt-3 text-whiteMain font-poppins ">
                         {data.results.artistmatches.artist
                             .slice(0, 5)
                             .map((artist, index) => {
@@ -32,13 +33,14 @@ const SearchPage = () => {
                                     <NavLink
                                         reloadDocument
                                         to={`/artist?id=${artist.mbid}`}
-                                        className="flex flex-col gap-3"
+                                        className={`flex flex-col gap-3 ${artist.mbid === "" && "hidden"}`}
                                     >
-                                        <img
-                                            src="https://lastfm.freetls.fastly.net/i/u/300x300/2a96cbd8b46e442fc41c2b86b821562f.png"
-                                            className=" w-40"
-                                        />
-                                        <p>{artist.name}</p>
+                                        <div className="max-h-[160px]">
+                                            <SimilarArtistsPicture
+                                                mbid={artist.mbid}
+                                            />
+                                            <p>{artist.name}</p>
+                                        </div>
                                     </NavLink>
                                 );
                             })}
