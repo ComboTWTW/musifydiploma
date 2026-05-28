@@ -11,8 +11,9 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 import EmailSignUp from "../components/SignUp Page/EmailSignUp";
+import EmailSignIn from "../components/SignInPage/EmailSignIn";
 
-const SignUpPage = () => {
+const SignInPage = () => {
     const signInWithGoogle = async () => {
         try {
             await signInWithPopup(auth, googleProvider);
@@ -33,10 +34,10 @@ const SignUpPage = () => {
                     textAlign: "center",
                 }}
             >
-                Create your account
+                Login with Email
             </Typography>
-            {/* Sign Up With Email Component */}
-            <EmailSignUp />
+            {/* Sign In With Email Component */}
+            <EmailSignIn />
 
             <Typography
                 variant="h5"
@@ -47,10 +48,10 @@ const SignUpPage = () => {
                     mt: 2,
                 }}
             >
-                Or Sign Up With Google
+                Or Continue With Google
             </Typography>
 
-            {/* Google Sign Up Button */}
+            {/* Google Sign In Button */}
             <Button
                 onClick={signInWithGoogle}
                 sx={{
@@ -88,4 +89,4 @@ const SignUpPage = () => {
     );
 };
 
-export default SignUpPage;
+export default SignInPage;
