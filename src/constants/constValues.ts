@@ -37,5 +37,5 @@ export const heroText: {
     subHeader:
         "Discover artists, albums and lyrics, track your listening history, and get personalized recommendations — all in one place, without relying on streaming services.",
     buttonText: "Get Started!",
-    buttonPath: "/login",
+    buttonPath: "/signup",
 };

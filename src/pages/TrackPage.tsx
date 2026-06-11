@@ -8,6 +8,8 @@ import { useQuery } from "@tanstack/react-query";
 import { getTrackLength } from "../functions/getTrackLength";
 import SimilarArtists from "../components/Artist Page/SimilarArtists";
 import SimilarTracks from "../components/Track Page/SimilarTracks";
+import Lyrics from "./Lyrics";
+import MediaActions from "../components/MediaActions";
 
 const TrackPage = () => {
     const [searchParams] = useSearchParams();
@@ -44,9 +46,19 @@ const TrackPage = () => {
                             {trackInfoData.track.artist.name}
                         </p>
                     </NavLink>
-                    <h2 className="font-poppins text-5xl font-semibold leading-[120%] text-whiteMain">
-                        {trackInfoData.track.name}
-                    </h2>
+                    <div className="flex gap-10">
+                        <h2 className="font-poppins text-5xl font-semibold leading-[120%] text-whiteMain">
+                            {trackInfoData.track.name}
+                        </h2>
+                        <MediaActions
+                            imageUrl={
+                                trackInfoData.track.album.image[3]["#text"]
+                            }
+                            lastfmId={trackMbid}
+                            mediaType="track"
+                            name={trackInfoData.track.name}
+                        />
+                    </div>
                     <div className="flex items-center text-center gap-5">
                         {" "}
                         <p
@@ -104,6 +116,12 @@ const TrackPage = () => {
                             </div>
                         </div>
                     )}
+                    <h2 className="font-poppins text-2xl font-semibold leading-[120%] text-whiteMain mt-4">
+                        Lyrics:
+                    </h2>
+                    <Lyrics
+                        q={`${trackInfoData.track.artist.name} ${trackInfoData.track.name}`}
+                    />
                     {/* Similar Tracks */}
                     <SimilarTracks trackMbid={trackMbid} />
                 </div>

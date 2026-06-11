@@ -17,6 +17,7 @@ import {
     type similarArtistsT,
 } from "../api/last.fm/artist/getSimilarArtists";
 import SimilarArtists from "../components/Artist Page/SimilarArtists";
+import MediaActions from "../components/MediaActions";
 
 const Artist = () => {
     const [searchParams] = useSearchParams();
@@ -82,9 +83,21 @@ const Artist = () => {
                 artistTopTracks &&
                 similarArtistsData && (
                     <div className="w-full flex flex-col gap-3 ">
-                        <h2 className="font-poppins text-5xl font-semibold leading-[120%] text-whiteMain">
-                            {artistData.artist.name}
-                        </h2>
+                        <div className="flex gap-10">
+                            <h2 className="font-poppins text-5xl font-semibold leading-[120%] text-whiteMain">
+                                {artistData.artist.name}
+                            </h2>
+                            <MediaActions
+                                imageUrl={`${
+                                    artistTopAlbums.topalbums.album[0].image[3][
+                                        "#text"
+                                    ]
+                                }`}
+                                lastfmId={mbid}
+                                mediaType="artist"
+                                name={artistData.artist.name}
+                            />
+                        </div>
                         <ul className="flex gap-5 my-1 ">
                             {artistData.artist.tags.tag
                                 .slice(0, 5)
