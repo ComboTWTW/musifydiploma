@@ -2,11 +2,43 @@ import { NavLink } from "react-router-dom";
 import { logoMain } from "../assets/assets";
 import { navbarButtons, navLinks } from "../constants/constValues";
 import SearchBar from "./Navbar/SearchBar";
-import { auth } from "../config/firebase";
+import { auth, db } from "../config/firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import { useState } from "react";
+import { doc, getDoc } from "firebase/firestore";
 
 const Navbar = () => {
     const user = auth.currentUser;
 
+    const [avatarUrl, setAvatarUrl] = useState(
+        "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original",
+    );
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            try {
+                const userRef = doc(db, "Users", user.uid);
+                const userSnap = await getDoc(userRef);
+
+                if (userSnap.exists()) {
+                    const userData = userSnap.data();
+
+                    setAvatarUrl(() => userData.photoURL);
+
+                    console.log("Avatar URL:", userData.photoURL);
+
+                    // Example:
+                    // setAvatarUrl(userData.avatarUrl)
+                } else {
+                    console.log("User document does not exist");
+                }
+            } catch (error) {
+                console.error("Error fetching user document:", error);
+            }
+        } else {
+            console.log("User is logged out");
+        }
+    });
     return (
         <nav className="w-full bg-border flex flex-col items-center justify-center  py-2">
             <div className="max-w-360 w-full flex items-center justify-between px-4">
@@ -48,9 +80,10 @@ const Navbar = () => {
                             })}
                         </ul>
                     ) : (
+                        // Profile Picture
                         <NavLink to={"/profile"} reloadDocument>
                             <img
-                                src={`${user.photoURL}`}
+                                src={`${avatarUrl}`}
                                 alt="Profile Picture"
                                 className="rounded-full max-h-15"
                             />
