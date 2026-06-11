@@ -17,7 +17,7 @@ const Hero = () => {
         queryFn: getTopArtists,
     });
 
-    const artists = topArtistsData?.artists.artist.slice(2, 6);
+    const artists = topArtistsData?.artists.artist.slice(5, 9);
 
     useEffect(() => {
         refetch();

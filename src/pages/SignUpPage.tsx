@@ -11,11 +11,60 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 import EmailSignUp from "../components/SignUp Page/EmailSignUp";
+import { doc, setDoc, getDoc } from "firebase/firestore";
+import { db } from "../config/firebase";
 
 const SignUpPage = () => {
+    // Google sign up
     const signInWithGoogle = async () => {
         try {
-            await signInWithPopup(auth, googleProvider);
+            const result = await signInWithPopup(auth, googleProvider);
+
+            const user = result.user;
+
+            const userRef = doc(db, "Users", user.uid);
+            const userSnap = await getDoc(userRef);
+
+            // create only if user doesn't exist yet
+            if (!userSnap.exists()) {
+                await setDoc(userRef, {
+                    id: user.uid,
+
+                    name: user.displayName || "",
+                    email: user.email || "",
+
+                    photoURL: user.photoURL || "",
+
+                    role: "user",
+                    status: "",
+
+                    followers: [],
+                    following: [],
+
+                    lists: [
+                        {
+                            id: crypto.randomUUID(),
+                            name: "Favorites",
+                            visibility: "private",
+
+                            items: [],
+                        },
+
+                        {
+                            id: crypto.randomUUID(),
+                            name: "Listen Later",
+                            visibility: "private",
+
+                            items: [],
+                        },
+                    ],
+
+                    createdAt: new Date(),
+                });
+
+                console.log("User document created");
+            }
+
             window.location.href = "/profile";
         } catch (error) {
             console.error(error);

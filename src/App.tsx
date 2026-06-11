@@ -15,36 +15,67 @@ import { useState } from "react";
 import SearchBar from "./components/Navbar/SearchBar";
 import SearchPage from "./pages/SearchPage";
 import Artist from "./pages/Artist";
+import Track from "./pages/TrackPage";
+import TrackPage from "./pages/TrackPage";
+import AlbumPage from "./pages/AlbumPage";
+import SignInPage from "./pages/SignInPage";
+import EmailSignUp from "./components/SignUp Page/EmailSignUp";
+import { useQuery } from "@tanstack/react-query";
+import { getUser, type UserT } from "./functions/firebase/getUser";
 
 const App = () => {
     const [isSigned, setIsSigned] = useState<boolean | null>(null);
 
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
         if (user) {
-            setIsSigned(() => true);
-            // User is signed in, see docs for a list of available properties
-            // https://firebase.google.com/docs/reference/js/auth.user
-            const uid = user.uid;
-            // ...
+            setIsSigned(true);
+
+            // Create default lists if they don't exist
         } else {
-            // User is signed out
-            // ...
-            setIsSigned(() => false);
+            setIsSigned(false);
         }
     });
+
     return (
-        <div className="w-full h-screen overflow-hidden flex flex-col items-center bg-bgMain">
+        <div className="w-full min-h-screen overflow-hidden flex flex-col items-center bg-bgMain ">
             {isSigned !== null && (
                 <Router>
                     <Navbar />
                     <div className="max-w-360 w-full px-4 flex items-center">
                         <Routes>
                             <Route path="/" element={<Home />} />
-                            <Route path="/signup" element={<SignUpPage />} />
+                            {/* Sign Up Page */}
+                            <Route
+                                path="/signup"
+                                element={
+                                    isSigned === true ? (
+                                        <Navigate to="/" />
+                                    ) : (
+                                        isSigned === false && <SignUpPage />
+                                    )
+                                }
+                            />
+                            {/* Sign In Page */}
+                            <Route
+                                path="/login"
+                                element={
+                                    isSigned === true ? (
+                                        <Navigate to="/" />
+                                    ) : (
+                                        isSigned === false && <SignInPage />
+                                    )
+                                }
+                            />
+                            {/* Search Page */}
                             <Route path="/search?" element={<SearchPage />} />
-
+                            {/* Artist Page */}
                             <Route path="/artist?" element={<Artist />} />
+                            {/* Album Page */}
+                            <Route path="/album?" element={<AlbumPage />} />
+                            {/* Track Page */}
+                            <Route path="/track?" element={<TrackPage />} />
 
+                            {/* User Profile Page */}
                             <Route
                                 path="/profile"
                                 element={
