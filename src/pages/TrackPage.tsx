@@ -95,7 +95,7 @@ const TrackPage = () => {
                     {trackInfoData.track.album && (
                         <div className="flex gap-4">
                             <img
-                                src={`${trackInfoData.track.album.image[3]["#text"]}`}
+                                src={`${trackInfoData.track.album.image[3]["#text"] !== undefined ? trackInfoData.track.album.image[3]["#text"] : ""}`}
                                 alt=""
                             />
                             <div className="flex flex-col gap-3">
