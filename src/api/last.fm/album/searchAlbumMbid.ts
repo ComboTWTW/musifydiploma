@@ -79,5 +79,10 @@ export type SearchAlbumMbidT = {
         listeners: string;
         playcount: string;
         url: string;
+        wiki: {
+            published: string;
+            summary: string;
+            content: string;
+        };
     };
 };

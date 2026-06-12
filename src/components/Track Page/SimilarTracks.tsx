@@ -30,7 +30,7 @@ const SimilarTracks = ({ trackMbid }: Props) => {
     similarTracksData && console.log(similarTracksData);
 
     return (
-        similarTracksData && (
+        similarTracksData?.similartracks !== undefined && (
             <div className="flex flex-col gap-4  w-full mt-4">
                 <h2 className="font-poppins text-2xl font-semibold leading-[120%] text-whiteMain">
                     Similar Tracks
