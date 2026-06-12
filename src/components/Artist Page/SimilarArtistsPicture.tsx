@@ -23,7 +23,7 @@ const SimilarArtistsPicture = ({ mbid }: Props) => {
 
     return (
         <img
-            src={album?.image[3]["#text"]}
+            src={`${mbid !== "" ? album?.image[3]["#text"] : "https://lastfm.freetls.fastly.net/i/u/300x300/2a96cbd8b46e442fc41c2b86b821562f.png"}`}
             alt={album?.name}
             className="w-full h-full  rounded-md"
         />

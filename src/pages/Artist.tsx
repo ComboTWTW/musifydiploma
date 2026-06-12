@@ -18,6 +18,7 @@ import {
 } from "../api/last.fm/artist/getSimilarArtists";
 import SimilarArtists from "../components/Artist Page/SimilarArtists";
 import MediaActions from "../components/MediaActions";
+import ArtistInfoByName from "../components/Artist Page/ArtistInfoByName";
 
 const Artist = () => {
     const [searchParams] = useSearchParams();
@@ -78,7 +79,8 @@ const Artist = () => {
 
     return (
         <div className="w-full flex flex-col items-center mt-20">
-            {artistData &&
+            {mbid !== "" &&
+                artistData &&
                 artistTopAlbums &&
                 artistTopTracks &&
                 similarArtistsData && (
@@ -125,6 +127,7 @@ const Artist = () => {
                         <SimilarArtists similarArtists={similarArtistsData} />
                     </div>
                 )}
+            {mbid === "" && <ArtistInfoByName />}
         </div>
     );
 };
