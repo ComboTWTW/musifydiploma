@@ -24,7 +24,7 @@ const SearchPage = () => {
     useEffect(() => {
         refetch();
     }, []);
-    data && console.log(data);
+
     return (
         <div className="w-full flex flex-col items-center mt-20">
             <div className="w-full flex flex-col items-start gap-5">

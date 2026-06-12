@@ -16,7 +16,6 @@ const ArtistSearch = () => {
     useEffect(() => {
         refetch();
     }, []);
-    data && console.log(data);
     return (
         <div className="">
             {data && (
