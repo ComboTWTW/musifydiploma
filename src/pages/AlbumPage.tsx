@@ -51,6 +51,7 @@ const AlbumPage = () => {
                             lastfmId={albumInfoData.album.mbid}
                             mediaType="album"
                             name={albumInfoData.album.name}
+                            artistName={albumInfoData.album.artist}
                         />
                     </div>
                     {/* Album Tags */}

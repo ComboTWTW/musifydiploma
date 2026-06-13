@@ -11,15 +11,7 @@ import DialogContent from "@mui/material/DialogContent";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 
-import {
-    arrayUnion,
-    doc,
-    getDoc,
-    updateDoc,
-    collection,
-    addDoc,
-    Timestamp,
-} from "firebase/firestore";
+import { doc, getDoc, updateDoc, Timestamp } from "firebase/firestore";
 
 import { auth, db } from "../config/firebase";
 
@@ -28,6 +20,7 @@ interface Props {
     name: string;
     lastfmId: string;
     imageUrl: string;
+    artistName?: string;
 }
 
 interface UserList {
@@ -37,11 +30,15 @@ interface UserList {
     items: any[];
 }
 
-const MediaActions = ({ mediaType, name, lastfmId, imageUrl }: Props) => {
+const MediaActions = ({
+    mediaType,
+    name,
+    lastfmId,
+    imageUrl,
+    artistName,
+}: Props) => {
     const [lists, setLists] = useState<UserList[]>([]);
-
     const [open, setOpen] = useState(false);
-
     const [newListName, setNewListName] = useState("");
     const [showInput, setShowInput] = useState(false);
 
@@ -54,6 +51,7 @@ const MediaActions = ({ mediaType, name, lastfmId, imageUrl }: Props) => {
         name,
         lastfmId,
         imageUrl,
+        ...(mediaType !== "artist" && artistName ? { artistName } : {}),
         createdAt: Timestamp.now(),
     };
 
@@ -61,64 +59,98 @@ const MediaActions = ({ mediaType, name, lastfmId, imageUrl }: Props) => {
         loadLists();
     }, []);
 
-    const loadLists = async () => {
+    const addActivity = async (
+        actionType: "add" | "remove" | "create_list",
+        listName: string,
+        item: any,
+    ) => {
         const user = auth.currentUser;
-
         if (!user) return;
 
         const userRef = doc(db, "Users", user.uid);
-        const userSnap = await getDoc(userRef);
+        const snap = await getDoc(userRef);
+        if (!snap.exists()) return;
 
-        if (!userSnap.exists()) return;
+        const data = snap.data();
+        const prev = data.activity || [];
 
-        const data = userSnap.data();
+        const activityItem = {
+            id: crypto.randomUUID(),
+            createdAt: Timestamp.now(),
+            actionType,
+            listName,
+            data: item, // 👈 FULL MEDIA OBJECT HERE
+        };
 
+        await updateDoc(userRef, {
+            activity: [activityItem, ...prev],
+        });
+    };
+
+    const loadLists = async () => {
+        const user = auth.currentUser;
+        if (!user) return;
+
+        const userRef = doc(db, "Users", user.uid);
+        const snap = await getDoc(userRef);
+        if (!snap.exists()) return;
+
+        const data = snap.data();
         const userLists = data.lists || [];
 
         setLists(userLists);
 
-        // check if already added
         const favorites = userLists.find(
-            (list: UserList) => list.name === "Favorites",
+            (l: UserList) => l.name === "Favorites",
         );
-
         const listenLater = userLists.find(
-            (list: UserList) => list.name === "Listen Later",
+            (l: UserList) => l.name === "Listen Later",
         );
 
-        if (favorites?.items?.some((item: any) => item.lastfmId === lastfmId)) {
-            setFavoriteAdded(true);
-        }
+        setFavoriteAdded(
+            !!favorites?.items?.some((i: any) => i.lastfmId === lastfmId),
+        );
 
-        if (
-            listenLater?.items?.some((item: any) => item.lastfmId === lastfmId)
-        ) {
-            setListenLaterAdded(true);
-        }
+        setListenLaterAdded(
+            !!listenLater?.items?.some((i: any) => i.lastfmId === lastfmId),
+        );
     };
 
     const toggleInList = async (listId: string) => {
         const user = auth.currentUser;
-
         if (!user) return;
 
         const userRef = doc(db, "Users", user.uid);
+        const snap = await getDoc(userRef);
+        if (!snap.exists()) return;
 
-        const updatedLists = lists.map((list) => {
+        const data = snap.data();
+        const currentLists: UserList[] = data.lists || [];
+
+        let actionType: "add" | "remove" = "add";
+        let listName = "";
+
+        const updatedLists = currentLists.map((list) => {
             if (list.id !== listId) return list;
 
-            const alreadyExists = list.items?.some(
-                (item) => item.lastfmId === lastfmId,
+            listName = list.name;
+
+            const exists = list.items?.some(
+                (item: any) => item.lastfmId === lastfmId,
             );
 
-            if (alreadyExists) {
+            if (exists) {
+                actionType = "remove";
+
                 return {
                     ...list,
                     items: list.items.filter(
-                        (item) => item.lastfmId !== lastfmId,
+                        (item: any) => item.lastfmId !== lastfmId,
                     ),
                 };
             }
+
+            actionType = "add";
 
             return {
                 ...list,
@@ -126,32 +158,38 @@ const MediaActions = ({ mediaType, name, lastfmId, imageUrl }: Props) => {
             };
         });
 
-        setLists(updatedLists);
-
         await updateDoc(userRef, {
             lists: updatedLists,
         });
 
-        loadLists();
+        setLists(updatedLists);
+
+        await addActivity(actionType, listName, mediaItem);
+
+        await loadLists();
     };
 
     const createNewList = async () => {
         if (!newListName.trim()) return;
 
         const user = auth.currentUser;
-
         if (!user) return;
 
         const userRef = doc(db, "Users", user.uid);
+        const snap = await getDoc(userRef);
+        if (!snap.exists()) return;
 
-        const newList = {
+        const data = snap.data();
+        const currentLists: UserList[] = data.lists || [];
+
+        const newList: UserList = {
             id: crypto.randomUUID(),
             name: newListName,
             visibility: "private",
             items: [mediaItem],
         };
 
-        const updatedLists = [...lists, newList];
+        const updatedLists = [...currentLists, newList];
 
         await updateDoc(userRef, {
             lists: updatedLists,
@@ -159,13 +197,16 @@ const MediaActions = ({ mediaType, name, lastfmId, imageUrl }: Props) => {
 
         setLists(updatedLists);
 
+        await addActivity("create_list", newListName, mediaItem);
+
         setNewListName("");
         setShowInput(false);
+
+        await loadLists();
     };
 
     const quickAdd = async (targetName: string) => {
         const target = lists.find((l) => l.name === targetName);
-
         if (!target) return;
 
         await toggleInList(target.id);
@@ -174,11 +215,7 @@ const MediaActions = ({ mediaType, name, lastfmId, imageUrl }: Props) => {
     return (
         <>
             <div className="flex items-center gap-5">
-                {/* FAVORITES */}
-                <button
-                    onClick={() => quickAdd("Favorites")}
-                    className="transition hover:scale-110"
-                >
+                <button onClick={() => quickAdd("Favorites")}>
                     <FavoriteIcon
                         sx={{
                             fontSize: 34,
@@ -187,11 +224,7 @@ const MediaActions = ({ mediaType, name, lastfmId, imageUrl }: Props) => {
                     />
                 </button>
 
-                {/* LISTEN LATER */}
-                <button
-                    onClick={() => quickAdd("Listen Later")}
-                    className="transition hover:scale-110"
-                >
+                <button onClick={() => quickAdd("Listen Later")}>
                     <BookmarkIcon
                         sx={{
                             fontSize: 34,
@@ -200,11 +233,7 @@ const MediaActions = ({ mediaType, name, lastfmId, imageUrl }: Props) => {
                     />
                 </button>
 
-                {/* OPEN LISTS */}
-                <button
-                    onClick={() => setOpen(true)}
-                    className="transition hover:scale-110"
-                >
+                <button onClick={() => setOpen(true)}>
                     <FormatListBulletedAddIcon
                         sx={{
                             fontSize: 36,
@@ -214,97 +243,53 @@ const MediaActions = ({ mediaType, name, lastfmId, imageUrl }: Props) => {
                 </button>
             </div>
 
-            <Dialog
-                open={open}
-                onClose={() => setOpen(false)}
-                PaperProps={{
-                    sx: {
-                        backgroundColor: "#1E1E26",
-                        color: "#E6E6EB",
-                        minWidth: "350px",
-                        borderRadius: "12px",
-                    },
-                }}
-            >
-                <DialogTitle
-                    className="bg-bgMain text-whiteMain"
-                    sx={{
-                        fontFamily: "Poppins",
-                        fontWeight: 600,
-                    }}
-                >
-                    Add to List
-                </DialogTitle>
+            <Dialog open={open} onClose={() => setOpen(false)}>
+                <DialogTitle>Add to List</DialogTitle>
 
-                <DialogContent className="bg-bgMain text-whiteMain">
+                <DialogContent>
                     <div className="flex flex-col gap-2 mt-2">
                         {lists.map((list) => {
                             const checked = list.items?.some(
-                                (item) => item.lastfmId === lastfmId,
+                                (item: any) => item.lastfmId === lastfmId,
                             );
 
                             return (
                                 <div
                                     key={list.id}
-                                    className="flex items-center justify-between bg-[#2A2A35] rounded-lg px-3 py-2"
+                                    className="flex justify-between items-center bg-[#2A2A35] px-3 py-2 rounded-lg"
                                 >
-                                    <span className="font-poppins text-sm">
-                                        {list.name}
-                                    </span>
+                                    <span>{list.name}</span>
 
                                     <Checkbox
                                         checked={checked}
                                         onChange={() => toggleInList(list.id)}
-                                        sx={{
-                                            color: "#8B5CF6",
-                                            "&.Mui-checked": {
-                                                color: "#8B5CF6",
-                                            },
-                                        }}
                                     />
                                 </div>
                             );
                         })}
 
                         {!showInput ? (
-                            <Button
-                                onClick={() => setShowInput(true)}
-                                sx={{
-                                    mt: 1,
-                                    color: "#8B5CF6",
-                                    textTransform: "none",
-                                }}
-                            >
+                            <Button onClick={() => setShowInput(true)}>
                                 + Create New List
                             </Button>
                         ) : (
-                            <div className="flex flex-col gap-2 mt-2">
+                            <>
                                 <TextField
-                                    size="small"
                                     value={newListName}
                                     onChange={(e) =>
                                         setNewListName(e.target.value)
                                     }
                                     placeholder="List name..."
                                     fullWidth
-                                    sx={{
-                                        input: {
-                                            color: "#E6E6EB",
-                                        },
-                                    }}
                                 />
 
                                 <Button
                                     variant="contained"
                                     onClick={createNewList}
-                                    sx={{
-                                        backgroundColor: "#8B5CF6",
-                                        textTransform: "none",
-                                    }}
                                 >
                                     Create
                                 </Button>
-                            </div>
+                            </>
                         )}
                     </div>
                 </DialogContent>

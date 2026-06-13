@@ -100,6 +100,7 @@ const TrackPage = () => {
                         lastfmId={trackMbid}
                         mediaType="track"
                         name={currentTrackInfo.track.name}
+                        artistName={currentTrackInfo.track.artist.name}
                     />
                 </div>
 
