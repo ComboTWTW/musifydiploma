@@ -273,7 +273,7 @@ const EmailSignUp = () => {
                             items: [],
                         },
                     ],
-
+                    usernameLower: user.displayName?.toLowerCase(),
                     createdAt: new Date(),
                 });
                 window.location.href = `/profile?section=overview&id=${auth.currentUser?.uid}`;

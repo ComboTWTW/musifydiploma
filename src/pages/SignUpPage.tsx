@@ -74,6 +74,7 @@ const SignUpPage = () => {
                     ],
 
                     createdAt: new Date(),
+                    usernameLower: user.displayName?.toLowerCase(),
                 });
             }
 

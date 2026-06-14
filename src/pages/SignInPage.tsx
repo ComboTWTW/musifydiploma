@@ -72,7 +72,7 @@ const SignInPage = () => {
                             items: [],
                         },
                     ],
-
+                    usernameLower: user.displayName?.toLowerCase(),
                     createdAt: new Date(),
                 });
             }

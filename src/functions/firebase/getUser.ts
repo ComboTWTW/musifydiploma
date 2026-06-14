@@ -48,6 +48,7 @@ export interface UserT {
     lists: UserList[];
 
     activity?: ActivityItem[];
+    usernameLower?: string;
 
     createdAt: Timestamp;
     profileVisibility: "public" | "private";
