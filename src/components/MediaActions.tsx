@@ -59,16 +59,13 @@ const MediaActions = ({
         loadLists();
     }, []);
 
-    const addActivity = async (
-        actionType: "add" | "remove" | "create_list",
-        listName: string,
-        item: any,
-    ) => {
+    const addActivity = async (listName: string, item: any) => {
         const user = auth.currentUser;
         if (!user) return;
 
         const userRef = doc(db, "Users", user.uid);
         const snap = await getDoc(userRef);
+
         if (!snap.exists()) return;
 
         const data = snap.data();
@@ -77,13 +74,12 @@ const MediaActions = ({
         const activityItem = {
             id: crypto.randomUUID(),
             createdAt: Timestamp.now(),
-            actionType,
             listName,
-            data: item, // 👈 FULL MEDIA OBJECT HERE
+            data: item,
         };
 
         await updateDoc(userRef, {
-            activity: [activityItem, ...prev],
+            activity: [activityItem, ...prev].slice(0, 200),
         });
     };
 
@@ -107,50 +103,48 @@ const MediaActions = ({
             (l: UserList) => l.name === "Listen Later",
         );
 
-        setFavoriteAdded(
-            !!favorites?.items?.some((i: any) => i.lastfmId === lastfmId),
-        );
+        setFavoriteAdded(!!favorites?.items?.some(isSameMedia));
 
-        setListenLaterAdded(
-            !!listenLater?.items?.some((i: any) => i.lastfmId === lastfmId),
-        );
+        setListenLaterAdded(!!listenLater?.items?.some(isSameMedia));
     };
 
+    const isSameMedia = (item: any) => {
+        return (
+            item.mediaType === mediaType &&
+            item.name === name &&
+            (item.artistName || "") === (artistName || "")
+        );
+    };
     const toggleInList = async (listId: string) => {
         const user = auth.currentUser;
         if (!user) return;
 
         const userRef = doc(db, "Users", user.uid);
         const snap = await getDoc(userRef);
+
         if (!snap.exists()) return;
 
         const data = snap.data();
         const currentLists: UserList[] = data.lists || [];
 
-        let actionType: "add" | "remove" = "add";
-        let listName = "";
+        let wasAdded = false;
+        let targetListName = "";
 
         const updatedLists = currentLists.map((list) => {
             if (list.id !== listId) return list;
 
-            listName = list.name;
+            targetListName = list.name;
 
-            const exists = list.items?.some(
-                (item: any) => item.lastfmId === lastfmId,
-            );
+            const exists = list.items?.some(isSameMedia);
 
             if (exists) {
-                actionType = "remove";
-
                 return {
                     ...list,
-                    items: list.items.filter(
-                        (item: any) => item.lastfmId !== lastfmId,
-                    ),
+                    items: list.items.filter((item: any) => !isSameMedia(item)),
                 };
             }
 
-            actionType = "add";
+            wasAdded = true;
 
             return {
                 ...list,
@@ -164,27 +158,48 @@ const MediaActions = ({
 
         setLists(updatedLists);
 
-        await addActivity(actionType, listName, mediaItem);
+        const favorites = updatedLists.find((l) => l.name === "Favorites");
 
-        await loadLists();
+        const listenLater = updatedLists.find((l) => l.name === "Listen Later");
+
+        setFavoriteAdded(!!favorites?.items?.some(isSameMedia));
+
+        setListenLaterAdded(!!listenLater?.items?.some(isSameMedia));
+
+        // history only for additions
+        if (wasAdded) {
+            await addActivity(targetListName, mediaItem);
+        }
     };
 
     const createNewList = async () => {
-        if (!newListName.trim()) return;
+        const trimmed = newListName.trim();
+
+        if (!trimmed) return;
 
         const user = auth.currentUser;
         if (!user) return;
 
         const userRef = doc(db, "Users", user.uid);
         const snap = await getDoc(userRef);
+
         if (!snap.exists()) return;
 
         const data = snap.data();
         const currentLists: UserList[] = data.lists || [];
 
+        const exists = currentLists.some(
+            (list) => list.name.toLowerCase() === trimmed.toLowerCase(),
+        );
+
+        if (exists) {
+            alert("List already exists.");
+            return;
+        }
+
         const newList: UserList = {
             id: crypto.randomUUID(),
-            name: newListName,
+            name: trimmed,
             visibility: "private",
             items: [mediaItem],
         };
@@ -197,12 +212,8 @@ const MediaActions = ({
 
         setLists(updatedLists);
 
-        await addActivity("create_list", newListName, mediaItem);
-
         setNewListName("");
         setShowInput(false);
-
-        await loadLists();
     };
 
     const quickAdd = async (targetName: string) => {
@@ -243,33 +254,95 @@ const MediaActions = ({
                 </button>
             </div>
 
-            <Dialog open={open} onClose={() => setOpen(false)}>
-                <DialogTitle>Add to List</DialogTitle>
+            <Dialog
+                open={open}
+                onClose={() => setOpen(false)}
+                PaperProps={{
+                    sx: {
+                        backgroundColor: "#2A2A35",
+                        border: "1px solid #0f0f14",
+                        borderRadius: "12px",
+                        minWidth: "360px",
+                    },
+                }}
+            >
+                <DialogTitle
+                    sx={{
+                        color: "#E6E6EB",
+                        backgroundColor: "#1F1F27",
+                        fontFamily: "Poppins",
+                        fontWeight: 600,
+                        borderBottom: "1px solid #0f0f14",
+                    }}
+                >
+                    Add to List
+                </DialogTitle>
 
-                <DialogContent>
+                <DialogContent
+                    sx={{
+                        backgroundColor: "#1F1F27",
+                        paddingTop: "12px",
+                    }}
+                >
                     <div className="flex flex-col gap-2 mt-2">
-                        {lists.map((list) => {
-                            const checked = list.items?.some(
-                                (item: any) => item.lastfmId === lastfmId,
-                            );
+                        {lists
+                            .filter(
+                                (list) =>
+                                    list.name !== "Favorites" &&
+                                    list.name !== "Listen Later",
+                            )
+                            .map((list) => {
+                                const checked = list.items?.some(isSameMedia);
 
-                            return (
-                                <div
-                                    key={list.id}
-                                    className="flex justify-between items-center bg-[#2A2A35] px-3 py-2 rounded-lg"
-                                >
-                                    <span>{list.name}</span>
+                                return (
+                                    <div
+                                        key={list.id}
+                                        className="flex justify-between items-center px-3 py-2 rounded-lg"
+                                        style={{
+                                            backgroundColor: "#0f0f14",
+                                            border: "1px solid #0f0f14",
+                                        }}
+                                    >
+                                        <span
+                                            style={{
+                                                color: "#E6E6EB",
+                                                fontFamily: "Poppins",
+                                            }}
+                                        >
+                                            {list.name}
+                                        </span>
 
-                                    <Checkbox
-                                        checked={checked}
-                                        onChange={() => toggleInList(list.id)}
-                                    />
-                                </div>
-                            );
-                        })}
+                                        <Checkbox
+                                            checked={checked}
+                                            onChange={() =>
+                                                toggleInList(list.id)
+                                            }
+                                            sx={{
+                                                color: "#E6E6EB",
+                                                "&.Mui-checked": {
+                                                    color: "#7C5CFF",
+                                                },
+                                            }}
+                                        />
+                                    </div>
+                                );
+                            })}
 
                         {!showInput ? (
-                            <Button onClick={() => setShowInput(true)}>
+                            <Button
+                                onClick={() => setShowInput(true)}
+                                sx={{
+                                    color: "#7C5CFF",
+                                    fontFamily: "Poppins",
+                                    textTransform: "none",
+                                    justifyContent: "flex-start",
+                                    paddingLeft: 0,
+                                    "&:hover": {
+                                        backgroundColor: "transparent",
+                                        opacity: 0.8,
+                                    },
+                                }}
+                            >
                                 + Create New List
                             </Button>
                         ) : (
@@ -281,11 +354,38 @@ const MediaActions = ({
                                     }
                                     placeholder="List name..."
                                     fullWidth
+                                    sx={{
+                                        input: {
+                                            color: "#E6E6EB",
+                                            fontFamily: "Poppins",
+                                        },
+                                        "& .MuiOutlinedInput-root": {
+                                            "& fieldset": {
+                                                borderColor: "#0f0f14",
+                                            },
+                                            "&:hover fieldset": {
+                                                borderColor: "#7C5CFF",
+                                            },
+                                            "&.Mui-focused fieldset": {
+                                                borderColor: "#7C5CFF",
+                                            },
+                                            backgroundColor: "#1F1F27",
+                                        },
+                                    }}
                                 />
 
                                 <Button
                                     variant="contained"
                                     onClick={createNewList}
+                                    sx={{
+                                        backgroundColor: "#7C5CFF",
+                                        fontFamily: "Poppins",
+                                        textTransform: "none",
+                                        marginTop: "8px",
+                                        "&:hover": {
+                                            backgroundColor: "#6a4df0",
+                                        },
+                                    }}
                                 >
                                     Create
                                 </Button>
