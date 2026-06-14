@@ -1,9 +1,8 @@
 import { useMemo, useState, useEffect } from "react";
 import { NavLink, useNavigate, useSearchParams } from "react-router-dom";
-
 import { doc, updateDoc, setDoc, deleteDoc } from "firebase/firestore";
-import { auth, db } from "../../config/firebase";
 
+import { auth, db } from "../../config/firebase";
 import type { UserT } from "../../functions/firebase/getUser";
 
 interface Props {
@@ -16,10 +15,12 @@ const ListView = ({ userData }: Props) => {
 
     const listName = searchParams.get("listName");
     const show = searchParams.get("show");
+    const profileId = searchParams.get("id"); // profile owner
+
+    const isOwnProfile = auth.currentUser?.uid === profileId;
 
     const [localLists, setLocalLists] = useState(userData.lists);
 
-    // 🔁 keep in sync if parent updates
     useEffect(() => {
         setLocalLists(userData.lists);
     }, [userData.lists]);
@@ -38,6 +39,17 @@ const ListView = ({ userData }: Props) => {
             return true;
         });
     }, [currentList, show]);
+
+    const buildLink = (params: Record<string, string>) => {
+        const idPart = profileId ? `&id=${profileId}` : "";
+        const base = `/profile?section=listView${idPart}`;
+
+        const extra = Object.entries(params)
+            .map(([k, v]) => `&${k}=${encodeURIComponent(v)}`)
+            .join("");
+
+        return `${base}${extra}`;
+    };
 
     const syncPublicList = async (updatedLists: typeof localLists) => {
         const user = auth.currentUser;
@@ -58,6 +70,8 @@ const ListView = ({ userData }: Props) => {
     };
 
     const removeItem = async (itemId: string) => {
+        if (!isOwnProfile) return;
+
         const user = auth.currentUser;
         if (!user || !currentList) return;
 
@@ -82,6 +96,8 @@ const ListView = ({ userData }: Props) => {
     };
 
     const toggleVisibility = async () => {
+        if (!isOwnProfile) return;
+
         const user = auth.currentUser;
         if (!user || !currentList) return;
 
@@ -125,6 +141,8 @@ const ListView = ({ userData }: Props) => {
     };
 
     const deleteList = async () => {
+        if (!isOwnProfile) return;
+
         const user = auth.currentUser;
         if (!user || !currentList) return;
 
@@ -147,7 +165,9 @@ const ListView = ({ userData }: Props) => {
             );
         }
 
-        navigate("/profile?section=myLists");
+        navigate(
+            `/profile?section=myLists${profileId ? `&id=${profileId}` : ""}`,
+        );
     };
 
     if (!currentList) {
@@ -162,7 +182,9 @@ const ListView = ({ userData }: Props) => {
                     List «{listName}»
                 </h2>
 
-                {currentList.name !== "Favorites" &&
+                {/* ONLY OWNER CONTROLS */}
+                {isOwnProfile &&
+                    currentList.name !== "Favorites" &&
                     currentList.name !== "Listen Later" && (
                         <div className="flex gap-5">
                             <div className="flex items-center gap-2">
@@ -197,7 +219,10 @@ const ListView = ({ userData }: Props) => {
                 {["artists", "albums", "tracks"].map((type) => (
                     <NavLink
                         key={type}
-                        to={`/profile?section=listView&listName=${listName}&show=${type}`}
+                        to={buildLink({
+                            listName: listName || "",
+                            show: type,
+                        })}
                         className={`capitalize text-3xl font-poppins hover:text-purpleMain ${
                             show === type
                                 ? "text-purpleMain underline underline-offset-8"
@@ -220,10 +245,10 @@ const ListView = ({ userData }: Props) => {
                             <NavLink
                                 to={
                                     item.mediaType === "artist"
-                                        ? `/artist?id=${item.lastfmId}`
+                                        ? `/artist?id=&name=${item.name}`
                                         : item.mediaType === "album"
-                                          ? `/album?id=${item.lastfmId}`
-                                          : `/track?id=${item.lastfmId}`
+                                          ? `/album?id=&artist=${item.artistName}&album=${item.name}`
+                                          : `/track?id=&artist=${item.artistName}&name=${item.name}`
                                 }
                                 className="flex items-center gap-4 flex-1"
                             >
@@ -241,12 +266,15 @@ const ListView = ({ userData }: Props) => {
                                 </div>
                             </NavLink>
 
-                            <button
-                                onClick={() => removeItem(item.id)}
-                                className="opacity-0 group-hover:opacity-100 text-red-500 px-3"
-                            >
-                                ✕
-                            </button>
+                            {/* ONLY OWNER CAN REMOVE */}
+                            {isOwnProfile && (
+                                <button
+                                    onClick={() => removeItem(item.id)}
+                                    className="opacity-0 group-hover:opacity-100 text-red-500 px-3"
+                                >
+                                    ✕
+                                </button>
+                            )}
                         </div>
                     </li>
                 ))}
