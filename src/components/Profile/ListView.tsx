@@ -272,7 +272,7 @@ const ListView = ({ userData }: Props) => {
                                         ? `/artist?id=&name=${item.name}`
                                         : item.mediaType === "album"
                                           ? `/album?artist=${item.artistName}&album=${item.name}`
-                                          : `/track?id=${item.lastfmId}`
+                                          : `/track?id=&artist=${item.artistName}&name=${item.name}`
                                 }
                                 reloadDocument
                                 className="flex items-center gap-4 flex-1"
