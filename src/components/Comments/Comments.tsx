@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { NavLink, useSearchParams } from "react-router-dom";
 import {
     collection,
@@ -9,6 +9,7 @@ import {
     onSnapshot,
     deleteDoc,
     doc,
+    getDoc,
 } from "firebase/firestore";
 
 import { auth, db } from "../../config/firebase";
@@ -75,7 +76,6 @@ const Comments = () => {
 
     const target = getTarget();
 
-    // 🔥 REALTIME FETCH (NO ORDER BY → avoids index requirement)
     useEffect(() => {
         if (!target) return;
 
@@ -91,7 +91,6 @@ const Comments = () => {
                 ...(d.data() as Omit<Comment, "id">),
             }));
 
-            //  sort on client instead of Firestore
             data.sort((a, b) => {
                 const aTime = a.createdAt?.seconds || 0;
                 const bTime = b.createdAt?.seconds || 0;
@@ -104,18 +103,23 @@ const Comments = () => {
         return () => unsub();
     }, [target?.targetId, target?.type]);
 
+    // SEND COMMENT (FIXED: uses Firestore user name)
     const handleSend = async () => {
         if (!user || !text.trim() || !target) return;
 
         setSending(true);
 
         try {
+            const userSnap = await getDoc(doc(db, "Users", user.uid));
+
+            const userData = userSnap.exists() ? userSnap.data() : null;
+
             await addDoc(collection(db, "Comments"), {
                 text: text.trim(),
 
                 userId: user.uid,
-                userName: user.displayName || "Unknown",
-                userPhoto: user.photoURL || "",
+                userName: userData?.name || "Unknown",
+                userPhoto: userData?.photoURL || "",
 
                 targetType: target.type,
                 targetId: target.targetId,
@@ -142,7 +146,7 @@ const Comments = () => {
     if (!user) return null;
 
     return (
-        <div className="flex flex-col gap-6 w-full">
+        <div className="flex flex-col gap-6 w-full mt-10">
             {/* INPUT */}
             <div className="flex items-start gap-4 w-full bg-[#1F1F27] p-4 rounded-xl">
                 <img
@@ -187,6 +191,7 @@ const Comments = () => {
                         {/* avatar */}
                         <NavLink
                             to={`/profile?section=overview&id=${c.userId}`}
+                            reloadDocument
                         >
                             <img
                                 src={c.userPhoto}
