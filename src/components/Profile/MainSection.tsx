@@ -3,6 +3,7 @@ import { type UserT } from "../../functions/firebase/getUser";
 import Overview from "./Overview";
 import { useSearchParams } from "react-router-dom";
 import History from "./History";
+import ListView from "./ListView";
 
 interface Props {
     userData: UserT;
@@ -11,7 +12,7 @@ interface Props {
 const MainSection = ({ userData }: Props) => {
     const [searchParams] = useSearchParams();
     const sectionParam = searchParams.get("section");
-    console.log(sectionParam);
+
     return (
         <div className="flex flex-col w-full">
             {(sectionParam === null || sectionParam === "overview") && (
@@ -19,6 +20,7 @@ const MainSection = ({ userData }: Props) => {
             )}
             {sectionParam === "myLists" && <MyLists userData={userData} />}
             {sectionParam === "history" && <History userData={userData} />}
+            {sectionParam === "listView" && <ListView userData={userData} />}
         </div>
     );
 };

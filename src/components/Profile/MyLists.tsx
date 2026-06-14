@@ -30,10 +30,11 @@ const MyLists = ({ userData }: Props) => {
                         return (
                             <li key={list.id} className="flex flex-col gap-3">
                                 <NavLink
-                                    to={`/profile?list=${encodeURIComponent(
+                                    to={`/profile?section=listView&listName=${encodeURIComponent(
                                         list.name,
-                                    )}`}
+                                    )}&show=artists`}
                                     className="flex flex-col gap-3"
+                                    reloadDocument
                                 >
                                     {/* 2x2 GRID */}
                                     <div className="grid grid-cols-2 w-[220px] h-[220px] overflow-hidden">
@@ -69,7 +70,7 @@ const MyLists = ({ userData }: Props) => {
                 to={`/profile?section=myLists`}
                 className={`mt-5 font-poppins font-medium text-xl underline-offset-4 underline text-whiteMain text-end ${sectionParam === "myLists" && "hidden"}`}
             >
-                Manage All Lists... {`>`}
+                View All Lists... {`>`}
             </NavLink>
         </div>
     );
