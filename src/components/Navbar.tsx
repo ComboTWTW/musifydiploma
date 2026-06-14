@@ -81,7 +81,10 @@ const Navbar = () => {
                         </ul>
                     ) : (
                         // Profile Picture
-                        <NavLink to={"/profile"} reloadDocument>
+                        <NavLink
+                            to={`/profile?section=overview&id=${auth.currentUser?.uid}`}
+                            reloadDocument
+                        >
                             <img
                                 src={`${avatarUrl}`}
                                 alt="Profile Picture"

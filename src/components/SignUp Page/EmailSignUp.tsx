@@ -276,7 +276,7 @@ const EmailSignUp = () => {
 
                     createdAt: new Date(),
                 });
-                window.location.href = `/profile?section=overview`;
+                window.location.href = `/profile?section=overview&id=${auth.currentUser?.uid}`;
             }
         } catch (error: any) {
             console.error(error);

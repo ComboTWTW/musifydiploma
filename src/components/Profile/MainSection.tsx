@@ -8,9 +8,10 @@ import Settings from "./Settings";
 
 interface Props {
     userData: UserT;
+    isOwnProfile: boolean;
 }
 
-const MainSection = ({ userData }: Props) => {
+const MainSection = ({ userData, isOwnProfile }: Props) => {
     const [searchParams] = useSearchParams();
     const sectionParam = searchParams.get("section");
 
@@ -19,9 +20,15 @@ const MainSection = ({ userData }: Props) => {
             {(sectionParam === null || sectionParam === "overview") && (
                 <Overview userData={userData} />
             )}
-            {sectionParam === "myLists" && <MyLists userData={userData} />}
+
+            {sectionParam === "myLists" && (
+                <MyLists userData={userData} isOwnProfile={isOwnProfile} />
+            )}
+
             {sectionParam === "history" && <History userData={userData} />}
+
             {sectionParam === "listView" && <ListView userData={userData} />}
+
             {sectionParam === "settings" && <Settings userData={userData} />}
         </div>
     );

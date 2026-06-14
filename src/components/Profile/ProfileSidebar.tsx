@@ -30,7 +30,7 @@ const ProfileSidebar = ({ sideBarLink, setSideBarLink }: Props) => {
                         <NavLink
                             key={link.linkTo}
                             reloadDocument
-                            to={`${link.linkTo === "favorites" ? "/profile?section=listView&listName=Favorites&show=artists" : `/profile?section=${link.linkTo}`}`}
+                            to={`${link.linkTo === "favorites" ? `/profile?section=listView&id=${auth.currentUser?.uid}&listName=Favorites&show=artists` : `/profile?section=${link.linkTo}&id=${auth.currentUser?.uid}`}`}
                             className={`capitalize text-3xl font-poppins font-semibold hover:text-purpleMain ${link.linkTo === sectionParam ? "text-purpleMain underline-offset-8 underline " : "text-white"}`}
                             onClick={() => setSideBarLink(() => link.linkTo)}
                         >

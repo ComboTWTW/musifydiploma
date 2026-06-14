@@ -67,7 +67,7 @@ const EmailSignIn = () => {
                 formData.password,
             );
 
-            window.location.href = `/profile?section=overview`;
+            window.location.href = `/profile?section=overview&id=${auth.currentUser?.uid}`;
         } catch (err: any) {
             console.error(err);
             setLoading(false);

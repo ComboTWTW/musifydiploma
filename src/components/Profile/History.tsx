@@ -1,4 +1,4 @@
-import React, { useReducer } from "react";
+import React from "react";
 import { NavLink, useSearchParams } from "react-router-dom";
 import type { UserT } from "../../functions/firebase/getUser";
 import { auth, db } from "../../config/firebase";
@@ -12,6 +12,9 @@ const History = ({ userData }: Props) => {
     const [searchParams] = useSearchParams();
     const sectionParam = searchParams.get("section");
 
+    // 🔑 get profile id from URL (important for other users)
+    const profileId = searchParams.get("id") || auth.currentUser?.uid || "";
+
     const clearHistory = async () => {
         const user = auth.currentUser;
         if (!user) return;
@@ -20,9 +23,10 @@ const History = ({ userData }: Props) => {
             const userRef = doc(db, "Users", user.uid);
 
             await updateDoc(userRef, {
-                activity: [], // or "history: []" depending on your field name
+                activity: [],
             });
-            window.location.href = "/profile";
+
+            window.location.href = `/profile?id=${user.uid}`;
 
             console.log("History cleared");
         } catch (error) {
@@ -36,12 +40,18 @@ const History = ({ userData }: Props) => {
                 <h2 className="font-poppins text-4xl leading-[120%] text-whiteMain font-semibold">
                     History
                 </h2>
-                <button
-                    className={`border-red-700  max-w-[175px] border bg-transparent cursor-pointer rounded-[10px] text-red-700 font-inter font-light py-2 px-4 ${sectionParam !== "history" && "hidden"}`}
-                    onClick={() => clearHistory()}
-                >
-                    Clear History
-                </button>
+
+                {/* only show for OWN profile */}
+                {auth.currentUser?.uid === profileId && (
+                    <button
+                        className={`border-red-700  max-w-[175px] border bg-transparent cursor-pointer rounded-[10px] text-red-700 font-inter font-light py-2 px-4 ${
+                            sectionParam !== "history" && "hidden"
+                        }`}
+                        onClick={() => clearHistory()}
+                    >
+                        Clear History
+                    </button>
+                )}
             </div>
 
             <ul className="flex flex-col gap-8 text-xl font-poppins mt-3">
@@ -87,6 +97,7 @@ const History = ({ userData }: Props) => {
                                     {` to `}
                                     <span>{act.listName}</span>
                                 </span>
+
                                 {/* TimeStamp*/}
                                 <span className="text-[12px] text-center">
                                     {`(`}
@@ -108,9 +119,13 @@ const History = ({ userData }: Props) => {
                         );
                     })}
             </ul>
+
+            {/* UPDATED VIEW ALL LINK (with id) */}
             <NavLink
-                to={`/profile?section=history`}
-                className={`mt-5 font-poppins font-medium text-xl underline-offset-4 underline text-whiteMain text-end ${sectionParam === "history" && "hidden"}`}
+                to={`/profile?section=history&id=${profileId}`}
+                className={`mt-5 font-poppins font-medium text-xl underline-offset-4 underline text-whiteMain text-end ${
+                    sectionParam === "history" && "hidden"
+                }`}
             >
                 View All History {`>`}
             </NavLink>

@@ -77,7 +77,7 @@ const SignInPage = () => {
                 });
             }
 
-            window.location.href = `/profile?section=overview`;
+            window.location.href = `/profile?section=overview&id=${auth.currentUser?.uid}`;
         } catch (error) {
             console.error(error);
         }

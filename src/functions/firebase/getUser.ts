@@ -50,6 +50,7 @@ export interface UserT {
     activity?: ActivityItem[];
 
     createdAt: Timestamp;
+    profileVisibility: "public" | "private";
 }
 
 export const getUser = async (uid: string): Promise<UserT> => {

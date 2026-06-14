@@ -1,70 +1,96 @@
-import { signOut } from "firebase/auth";
-import { NavLink, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { useSearchParams } from "react-router-dom";
 
 import { auth } from "../config/firebase";
-import MyLists from "../components/Profile/MyLists";
-import { useQuery } from "@tanstack/react-query";
-import { getUser, type UserT } from "../functions/firebase/getUser";
-import { useEffect, useState } from "react";
-import { profileSideBarLinks } from "../constants/constValues";
+import { getUser } from "../functions/firebase/getUser";
+
 import ProfileSidebar from "../components/Profile/ProfileSidebar";
 import MainSection from "../components/Profile/MainSection";
 
-import Icon from "@mui/material/Icon";
+import { useState } from "react";
 
 const Profile = () => {
-    const user = auth.currentUser;
+    const [searchParams] = useSearchParams();
+
+    const profileId = searchParams.get("id");
+    const currentUser = auth.currentUser;
+
+    const isOwnProfile = profileId === currentUser?.uid;
+
+    const [sideBarLink, setSideBarLink] = useState("overview");
 
     const { data, isLoading, error } = useQuery({
-        queryKey: ["user", user?.uid],
-        queryFn: () => getUser(user!.uid),
-        enabled: !!user?.uid,
+        queryKey: ["user", profileId],
+        queryFn: () => getUser(profileId!),
+        enabled: !!profileId,
     });
 
-    // Sidebar Link State
-    const [sideBarLink, setSideBarLink] = useState<string>("overview");
+    if (isLoading) {
+        return (
+            <div className="text-whiteMain mt-20 text-center">
+                Loading profile...
+            </div>
+        );
+    }
+
+    if (!data) {
+        return (
+            <div className="text-whiteMain mt-20 text-center">
+                User not found
+            </div>
+        );
+    }
 
     return (
         <div className="w-full flex flex-col items-center">
             <div className="w-full flex flex-col items-center mt-20">
-                {/* Top Section */}
+                {/* TOP SECTION */}
                 <div className="flex w-full gap-10 items-center">
-                    {/* Profile Picture */}
+                    {/* PROFILE IMAGE */}
                     <img
                         src={
-                            data?.photoURL?.startsWith(
+                            data.photoURL?.startsWith(
                                 "https://lh3.googleusercontent.com",
                             )
                                 ? `${data.photoURL.slice(0, -5)}s300-c`
-                                : `${data?.photoURL || ""}`
+                                : data.photoURL || ""
                         }
-                        alt="Profile Picture"
+                        alt="Profile"
                         className="max-w-[155px] rounded-full"
                     />
-                    {/* UserName */}
+
+                    {/* NAME + STATUS */}
                     <div className="flex flex-col gap-3">
-                        <h2 className="font-poppins text-4xl font-semibold leading-[120%] text-whiteMain">
-                            {data?.name}
+                        <h2 className="font-poppins text-4xl font-semibold text-whiteMain">
+                            {data.name}
                         </h2>
 
-                        <h3
-                            className={`font-poppins text-whiteMain ${
-                                !data?.status && "hidden"
-                            }`}
-                        >
-                            «{data?.status}»
-                        </h3>
+                        {data.status && (
+                            <h3 className="font-poppins text-whiteMain">
+                                «{data.status}»
+                            </h3>
+                        )}
+
+                        {/* OPTIONAL FOLLOW BUTTON */}
+                        {!isOwnProfile && (
+                            <button className="bg-purpleMain text-white px-4 py-2 rounded-lg w-fit">
+                                Follow
+                            </button>
+                        )}
                     </div>
                 </div>
-                {/* Main Section (SideBar and Main) */}
+
+                {/* MAIN SECTION */}
                 <div className="w-full flex mt-15 gap-20">
-                    {/* SideBar */}
-                    <ProfileSidebar
-                        sideBarLink={sideBarLink}
-                        setSideBarLink={setSideBarLink}
-                    />
-                    {/* Main Section */}
-                    {data && <MainSection userData={data} />}
+                    {/* SIDEBAR ONLY FOR OWN PROFILE */}
+                    {isOwnProfile && (
+                        <ProfileSidebar
+                            sideBarLink={sideBarLink}
+                            setSideBarLink={setSideBarLink}
+                        />
+                    )}
+
+                    <MainSection userData={data} isOwnProfile={isOwnProfile} />
                 </div>
             </div>
         </div>
