@@ -1,44 +1,55 @@
-import { doc, getDoc, Timestamp } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 
 import { db } from "../../config/firebase";
+
+import { Timestamp } from "firebase/firestore";
+
+export interface MediaItem {
+    id: string;
+    mediaType: "artist" | "album" | "track";
+    name: string;
+    lastfmId: string;
+    imageUrl: string;
+    artistName?: string;
+    createdAt: Timestamp;
+}
+
+export interface ActivityItem {
+    id: string;
+    createdAt: Timestamp;
+
+    actionType: "add" | "remove" | "create_list";
+
+    listName: string;
+
+    data: MediaItem; // full embedded media object
+}
+
+export interface UserList {
+    id: string;
+    name: string;
+    visibility: "public" | "private";
+    items: MediaItem[];
+}
 
 export interface UserT {
     id: string;
 
     name: string;
-
     email: string;
-
     photoURL: string;
 
-    role: string;
-
+    role: "user" | "moderator" | "admin";
     status: string;
 
     followers: string[];
-
     following: string[];
 
-    lists: {
-        id: string;
+    lists: UserList[];
 
-        name: string;
+    activity?: ActivityItem[];
 
-        visibility: "public" | "private";
-
-        items: {
-            id: string;
-
-            contentType: "artist" | "album" | "track";
-
-            title: string;
-
-            imageUrl: string;
-            createdAt: Timestamp;
-        }[];
-    }[];
-
-    createdAt: unknown;
+    createdAt: Timestamp;
 }
 
 export const getUser = async (uid: string): Promise<UserT> => {

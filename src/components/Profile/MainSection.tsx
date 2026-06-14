@@ -2,6 +2,7 @@ import MyLists from "./MyLists";
 import { type UserT } from "../../functions/firebase/getUser";
 import Overview from "./Overview";
 import { useSearchParams } from "react-router-dom";
+import History from "./History";
 
 interface Props {
     userData: UserT;
@@ -17,6 +18,7 @@ const MainSection = ({ userData }: Props) => {
                 <Overview userData={userData} />
             )}
             {sectionParam === "myLists" && <MyLists userData={userData} />}
+            {sectionParam === "history" && <History userData={userData} />}
         </div>
     );
 };

@@ -39,3 +39,30 @@ export const heroText: {
     buttonText: "Get Started!",
     buttonPath: "/signup",
 };
+
+export const profileSideBarLinks: { title: string; linkTo: string }[] = [
+    {
+        title: "overview",
+        linkTo: "overview",
+    },
+    {
+        title: "My Lists",
+        linkTo: "myLists",
+    },
+    {
+        title: "History",
+        linkTo: "history",
+    },
+    {
+        title: "favorites",
+        linkTo: "favorites",
+    },
+    {
+        title: "followers",
+        linkTo: "followers",
+    },
+    {
+        title: "following",
+        linkTo: "following",
+    },
+];

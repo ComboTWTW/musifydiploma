@@ -9,8 +9,8 @@ interface Props {
 const Overview = ({ userData }: Props) => {
     return (
         <div className="flex flex-col ">
-            <History userData={userData} />
             <MyLists userData={userData} />
+            <History userData={userData} />
         </div>
     );
 };

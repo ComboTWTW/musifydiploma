@@ -1,5 +1,5 @@
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import { auth, googleProvider } from "../config/firebase";
+import { auth, db, googleProvider } from "../config/firebase";
 import Paper from "@mui/material/Paper";
 import InputBase from "@mui/material/InputBase";
 import IconButton from "@mui/material/IconButton";
@@ -12,11 +12,69 @@ import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 import EmailSignUp from "../components/SignUp Page/EmailSignUp";
 import EmailSignIn from "../components/SignInPage/EmailSignIn";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 const SignInPage = () => {
+    // Google sign up
     const signInWithGoogle = async () => {
         try {
-            await signInWithPopup(auth, googleProvider);
+            const result = await signInWithPopup(auth, googleProvider);
+
+            const user = result.user;
+
+            const userRef = doc(db, "Users", user.uid);
+            const userSnap = await getDoc(userRef);
+
+            // create only if user doesn't exist yet
+            if (!userSnap.exists()) {
+                await setDoc(userRef, {
+                    id: user.uid,
+
+                    // profile
+                    name: user.displayName || "",
+                    email: user.email || "",
+                    photoURL: user.photoURL || "",
+
+                    role: "user", // user | moderator | admin
+                    status: "",
+
+                    // social
+                    followers: [],
+                    following: [],
+
+                    // profile comments
+                    comments: [],
+
+                    // private messsages metadata
+                    conversations: [],
+
+                    // activity feed
+                    activity: [],
+
+                    // lists
+                    lists: [
+                        {
+                            id: crypto.randomUUID(),
+                            name: "Favorites",
+                            visibility: "private",
+                            createdAt: new Date(),
+
+                            items: [],
+                        },
+                        {
+                            id: crypto.randomUUID(),
+                            name: "Listen Later",
+                            visibility: "private",
+                            createdAt: new Date(),
+
+                            items: [],
+                        },
+                    ],
+
+                    createdAt: new Date(),
+                });
+            }
+
             window.location.href = "/profile";
         } catch (error) {
             console.error(error);

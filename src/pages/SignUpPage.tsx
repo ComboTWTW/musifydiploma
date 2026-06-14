@@ -30,30 +30,42 @@ const SignUpPage = () => {
                 await setDoc(userRef, {
                     id: user.uid,
 
+                    // profile
                     name: user.displayName || "",
                     email: user.email || "",
-
                     photoURL: user.photoURL || "",
 
-                    role: "user",
+                    role: "user", // user | moderator | admin
                     status: "",
 
+                    // social
                     followers: [],
                     following: [],
 
+                    // profile comments
+                    comments: [],
+
+                    // private messages metadata
+                    conversations: [],
+
+                    // activity feed
+                    activity: [],
+
+                    // lists
                     lists: [
                         {
                             id: crypto.randomUUID(),
                             name: "Favorites",
                             visibility: "private",
+                            createdAt: new Date(),
 
                             items: [],
                         },
-
                         {
                             id: crypto.randomUUID(),
                             name: "Listen Later",
                             visibility: "private",
+                            createdAt: new Date(),
 
                             items: [],
                         },
@@ -61,8 +73,6 @@ const SignUpPage = () => {
 
                     createdAt: new Date(),
                 });
-
-                console.log("User document created");
             }
 
             window.location.href = "/profile";
