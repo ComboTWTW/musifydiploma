@@ -21,6 +21,7 @@ import {
     getSimilarArtistsByName,
     type similarArtistsByNameT,
 } from "../../api/last.fm/artist/getSimilarArtistsByName";
+import Comments from "../Comments/Comments";
 
 const ArtistInfoByName = () => {
     const [searchParams] = useSearchParams();
@@ -131,6 +132,8 @@ const ArtistInfoByName = () => {
                         <SimilarArtists
                             similarArtists={similarArtistsDataByName}
                         />
+                        {/* Comments Section */}
+                        <Comments />
                     </div>
                 )}
         </div>

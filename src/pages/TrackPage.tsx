@@ -13,6 +13,7 @@ import { getTrackLength } from "../functions/getTrackLength";
 import SimilarTracks from "../components/Track Page/SimilarTracks";
 import Lyrics from "./Lyrics";
 import MediaActions from "../components/MediaActions";
+import Comments from "../components/Comments/Comments";
 
 const TrackPage = () => {
     const [searchParams] = useSearchParams();
@@ -181,6 +182,7 @@ const TrackPage = () => {
                 />
 
                 <SimilarTracks trackMbid={trackMbid} />
+                <Comments />
             </div>
         </div>
     );

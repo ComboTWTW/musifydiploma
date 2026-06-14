@@ -6,6 +6,7 @@ import {
     type SearchAlbumMbidT,
 } from "../api/last.fm/album/searchAlbumMbid";
 import MediaActions from "../components/MediaActions";
+import Comments from "../components/Comments/Comments";
 
 const AlbumPage = () => {
     const [searchParams] = useSearchParams();
@@ -131,6 +132,8 @@ const AlbumPage = () => {
                             )}
                         </ol>
                     </div>
+                    {/* Comments Section */}
+                    <Comments />
                 </div>
             )}
         </div>

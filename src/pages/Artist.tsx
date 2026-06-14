@@ -19,6 +19,7 @@ import {
 import SimilarArtists from "../components/Artist Page/SimilarArtists";
 import MediaActions from "../components/MediaActions";
 import ArtistInfoByName from "../components/Artist Page/ArtistInfoByName";
+import Comments from "../components/Comments/Comments";
 
 const Artist = () => {
     const [searchParams] = useSearchParams();
@@ -125,6 +126,8 @@ const Artist = () => {
                         <TopTracks artistTopTracks={artistTopTracks} />
                         {/* Similar Artists Section */}
                         <SimilarArtists similarArtists={similarArtistsData} />
+                        {/* Comments Section */}
+                        <Comments />
                     </div>
                 )}
             {mbid === "" && <ArtistInfoByName />}
