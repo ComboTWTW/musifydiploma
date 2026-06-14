@@ -147,13 +147,14 @@ const Follows = ({ userId, followType }: Props) => {
                             {currentUser?.uid !== user.id && (
                                 <button
                                     onClick={() => handleUnfollow(user.id)}
-                                    className="
+                                    className={`
                                         opacity-0 group-hover:opacity-100
                                         transition
                                         text-red-500
                                         hover:text-red-400
                                         font-poppins text-sm
-                                    "
+                                        ${followType === "followers" && "hidden"}
+                                `}
                                 >
                                     Unfollow
                                 </button>
