@@ -7,7 +7,8 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Collapse from "@mui/material/Collapse";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../config/firebase";
+import { auth, db } from "../../config/firebase";
+import { doc, setDoc } from "firebase/firestore";
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
     color: "#E6E6EB",

@@ -5,6 +5,7 @@ import { useSearchParams } from "react-router-dom";
 import History from "./History";
 import ListView from "./ListView";
 import Settings from "./Settings";
+import Follows from "./Follows";
 
 interface Props {
     userData: UserT;
@@ -30,6 +31,12 @@ const MainSection = ({ userData, isOwnProfile }: Props) => {
             {sectionParam === "listView" && <ListView userData={userData} />}
 
             {sectionParam === "settings" && <Settings userData={userData} />}
+            {sectionParam === "followers" && (
+                <Follows userId={userData.id} followType="followers" />
+            )}
+            {sectionParam === "following" && (
+                <Follows userId={userData.id} followType="following" />
+            )}
         </div>
     );
 };

@@ -1,29 +1,98 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { NavLink, useSearchParams } from "react-router-dom";
-
-import { auth } from "../config/firebase";
+import { auth, db } from "../config/firebase";
 import { getUser } from "../functions/firebase/getUser";
-
 import ProfileSidebar from "../components/Profile/ProfileSidebar";
 import MainSection from "../components/Profile/MainSection";
-
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import {
+    doc,
+    updateDoc,
+    arrayUnion,
+    arrayRemove,
+    getDoc,
+} from "firebase/firestore";
 
 const Profile = () => {
     const [searchParams] = useSearchParams();
-
     const profileId = searchParams.get("id");
+
     const currentUser = auth.currentUser;
+    const queryClient = useQueryClient();
 
     const isOwnProfile = profileId === currentUser?.uid;
 
     const [sideBarLink, setSideBarLink] = useState("overview");
 
-    const { data, isLoading, error } = useQuery({
+    const { data, isLoading } = useQuery({
         queryKey: ["user", profileId],
         queryFn: () => getUser(profileId!),
         enabled: !!profileId,
     });
+
+    // 🔥 LOCAL STATE (this fixes your UI bug)
+    const [followers, setFollowers] = useState<string[]>([]);
+
+    // sync when data loads / changes
+    useEffect(() => {
+        if (data?.followers) {
+            setFollowers(data.followers);
+        }
+    }, [data]);
+
+    // 🔥 correct reactive follow check
+    const isFollowing = useMemo(() => {
+        return followers.includes(currentUser?.uid || "");
+    }, [followers, currentUser]);
+
+    const handleFollow = async () => {
+        if (!currentUser || !data) return;
+
+        const currentUserRef = doc(db, "Users", currentUser.uid);
+        const targetUserRef = doc(db, "Users", data.id);
+
+        const currentUserSnap = await getDoc(currentUserRef);
+        const currentUserData = currentUserSnap.data();
+
+        const alreadyFollowing = currentUserData?.following?.includes(data.id);
+
+        try {
+            if (alreadyFollowing) {
+                // ❌ UNFOLLOW
+                await updateDoc(currentUserRef, {
+                    following: arrayRemove(data.id),
+                });
+
+                await updateDoc(targetUserRef, {
+                    followers: arrayRemove(currentUser.uid),
+                });
+
+                // 🔥 instant UI update
+                setFollowers((prev) =>
+                    prev.filter((id) => id !== currentUser.uid),
+                );
+            } else {
+                // ✅ FOLLOW
+                await updateDoc(currentUserRef, {
+                    following: arrayUnion(data.id),
+                });
+
+                await updateDoc(targetUserRef, {
+                    followers: arrayUnion(currentUser.uid),
+                });
+
+                // 🔥 instant UI update
+                setFollowers((prev) => [...prev, currentUser.uid]);
+            }
+
+            // optional: refresh cached users
+            queryClient.invalidateQueries({
+                queryKey: ["user", profileId],
+            });
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     if (isLoading) {
         return (
@@ -46,9 +115,8 @@ const Profile = () => {
             <div className="w-full flex flex-col items-center mt-20">
                 {/* TOP SECTION */}
                 <div className="flex w-full gap-10 items-center">
-                    {/* PROFILE IMAGE */}
                     <NavLink
-                        to={`/profile?section=overview&id=${profileId || data.id}`}
+                        to={`/profile?section=overview&id=${profileId}`}
                         reloadDocument
                     >
                         <img
@@ -64,7 +132,6 @@ const Profile = () => {
                         />
                     </NavLink>
 
-                    {/* NAME + STATUS */}
                     <div className="flex flex-col gap-3">
                         <h2 className="font-poppins text-4xl font-semibold text-whiteMain">
                             {data.name}
@@ -76,18 +143,24 @@ const Profile = () => {
                             </h3>
                         )}
 
-                        {/* OPTIONAL FOLLOW BUTTON */}
+                        {/* FOLLOW BUTTON */}
                         {!isOwnProfile && (
-                            <button className="bg-purpleMain text-white px-4 py-2 rounded-lg w-fit">
-                                Follow
+                            <button
+                                onClick={handleFollow}
+                                className={`px-4 py-2 rounded-lg w-fit text-white transition ${
+                                    isFollowing
+                                        ? "bg-gray-600"
+                                        : "bg-purpleMain"
+                                }`}
+                            >
+                                {isFollowing ? "Unfollow" : "Follow"}
                             </button>
                         )}
                     </div>
                 </div>
 
-                {/* MAIN SECTION */}
+                {/* MAIN */}
                 <div className="w-full flex mt-15 gap-20">
-                    {/* SIDEBAR ONLY FOR OWN PROFILE */}
                     {isOwnProfile && (
                         <ProfileSidebar
                             sideBarLink={sideBarLink}
