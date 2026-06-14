@@ -4,6 +4,7 @@ import Overview from "./Overview";
 import { useSearchParams } from "react-router-dom";
 import History from "./History";
 import ListView from "./ListView";
+import Settings from "./Settings";
 
 interface Props {
     userData: UserT;
@@ -21,6 +22,7 @@ const MainSection = ({ userData }: Props) => {
             {sectionParam === "myLists" && <MyLists userData={userData} />}
             {sectionParam === "history" && <History userData={userData} />}
             {sectionParam === "listView" && <ListView userData={userData} />}
+            {sectionParam === "settings" && <Settings userData={userData} />}
         </div>
     );
 };

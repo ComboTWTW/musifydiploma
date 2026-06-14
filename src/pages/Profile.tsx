@@ -10,6 +10,8 @@ import { profileSideBarLinks } from "../constants/constValues";
 import ProfileSidebar from "../components/Profile/ProfileSidebar";
 import MainSection from "../components/Profile/MainSection";
 
+import Icon from "@mui/material/Icon";
+
 const Profile = () => {
     const user = auth.currentUser;
 
@@ -26,7 +28,7 @@ const Profile = () => {
         <div className="w-full flex flex-col items-center">
             <div className="w-full flex flex-col items-center mt-20">
                 {/* Top Section */}
-                <div className="flex w-full gap-10">
+                <div className="flex w-full gap-10 items-center">
                     {/* Profile Picture */}
                     <img
                         src={`${`${user?.photoURL}`.slice(0, -5)}s300-c`}
@@ -36,11 +38,15 @@ const Profile = () => {
                     {/* UserName */}
                     <div className="flex flex-col gap-3">
                         <h2 className="font-poppins text-4xl font-semibold leading-[120%] text-whiteMain">
-                            {user?.displayName}
+                            {data?.name}
                         </h2>
-                        {/* Status */}
-                        <h3 className="font-poppins text-whiteMain">
-                            «Eesti, Eesti, Eesti on my mind!»
+
+                        <h3
+                            className={`font-poppins text-whiteMain ${
+                                !data?.status && "hidden"
+                            }`}
+                        >
+                            «{data?.status}»
                         </h3>
                     </div>
                 </div>

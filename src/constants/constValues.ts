@@ -65,4 +65,8 @@ export const profileSideBarLinks: { title: string; linkTo: string }[] = [
         title: "following",
         linkTo: "following",
     },
+    {
+        title: "settings",
+        linkTo: "settings",
+    },
 ];
