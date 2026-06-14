@@ -54,6 +54,7 @@ const Settings = ({ userData }: Props) => {
 
             await updateDoc(doc(db, "Users", user.uid), {
                 name,
+                usernameLower: name.toLowerCase(),
                 status,
                 profileVisibility,
             });

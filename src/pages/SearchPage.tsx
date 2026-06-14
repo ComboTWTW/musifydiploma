@@ -8,11 +8,12 @@ import BandSearch from "../components/Search Page/ArtistSearch";
 import ArtistSearch from "../components/Search Page/ArtistSearch";
 import AlbumsSearch from "../components/Search Page/AlbumsSearch";
 import TrackSearch from "../components/Search Page/TrackSearch";
+import UserSearch from "../components/Search Page/UserSearch";
 
 const SearchPage = () => {
-    const [searchType, setSearchType] = useState<"artist" | "album" | "track">(
-        "artist",
-    );
+    const [searchType, setSearchType] = useState<
+        "artist" | "album" | "track" | "user"
+    >("artist");
 
     const [searchParams] = useSearchParams();
 
@@ -56,11 +57,20 @@ const SearchPage = () => {
                     >
                         Track
                     </li>
+                    <li
+                        onClick={() => {
+                            setSearchType("user");
+                        }}
+                        className={` font-poppins font-semibold text-2xl cursor-pointer ${searchType == "user" ? "underline underline-offset-4 text-purpleMain" : "text-white"}`}
+                    >
+                        User
+                    </li>
                 </ul>
 
                 {searchType === "artist" && <ArtistSearch />}
                 {searchType === "album" && <AlbumsSearch />}
                 {searchType === "track" && <TrackSearch />}
+                {searchType === "user" && <UserSearch />}
             </div>
         </div>
     );
