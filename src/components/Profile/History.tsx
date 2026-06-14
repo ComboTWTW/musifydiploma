@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useReducer } from "react";
 import { NavLink, useSearchParams } from "react-router-dom";
 import type { UserT } from "../../functions/firebase/getUser";
 import { auth, db } from "../../config/firebase";
@@ -22,6 +22,7 @@ const History = ({ userData }: Props) => {
             await updateDoc(userRef, {
                 activity: [], // or "history: []" depending on your field name
             });
+            window.location.href = "/profile";
 
             console.log("History cleared");
         } catch (error) {
