@@ -67,7 +67,7 @@ const EmailSignIn = () => {
                 formData.password,
             );
 
-            window.location.href = "/profile";
+            window.location.href = `/profile?section=overview`;
         } catch (err: any) {
             console.error(err);
             setLoading(false);

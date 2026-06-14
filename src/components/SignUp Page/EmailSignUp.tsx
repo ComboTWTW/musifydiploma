@@ -234,7 +234,9 @@ const EmailSignUp = () => {
                     // profile
                     name: user.displayName || "",
                     email: user.email || "",
-                    photoURL: user.photoURL || "",
+                    photoURL:
+                        user.photoURL ||
+                        "https://lastfm.freetls.fastly.net/i/u/avatar170s/818148bf682d429dc215c1705eb27b98.png",
 
                     role: "user", // user | moderator | admin
                     status: "",
@@ -274,6 +276,7 @@ const EmailSignUp = () => {
 
                     createdAt: new Date(),
                 });
+                window.location.href = `/profile?section=overview`;
             }
         } catch (error: any) {
             console.error(error);

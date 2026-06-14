@@ -31,7 +31,13 @@ const Profile = () => {
                 <div className="flex w-full gap-10 items-center">
                     {/* Profile Picture */}
                     <img
-                        src={`${`${user?.photoURL}`.slice(0, -5)}s300-c`}
+                        src={
+                            data?.photoURL?.startsWith(
+                                "https://lh3.googleusercontent.com",
+                            )
+                                ? `${data.photoURL.slice(0, -5)}s300-c`
+                                : `${data?.photoURL || ""}`
+                        }
                         alt="Profile Picture"
                         className="max-w-[155px] rounded-full"
                     />

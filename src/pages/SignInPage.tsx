@@ -33,7 +33,9 @@ const SignInPage = () => {
                     // profile
                     name: user.displayName || "",
                     email: user.email || "",
-                    photoURL: user.photoURL || "",
+                    photoURL:
+                        user.photoURL ||
+                        "https://lastfm.freetls.fastly.net/i/u/avatar170s/818148bf682d429dc215c1705eb27b98.png",
 
                     role: "user", // user | moderator | admin
                     status: "",
@@ -75,7 +77,7 @@ const SignInPage = () => {
                 });
             }
 
-            window.location.href = "/profile";
+            window.location.href = `/profile?section=overview`;
         } catch (error) {
             console.error(error);
         }
