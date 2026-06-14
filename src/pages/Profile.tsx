@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useSearchParams } from "react-router-dom";
+import { NavLink, useSearchParams } from "react-router-dom";
 
 import { auth } from "../config/firebase";
 import { getUser } from "../functions/firebase/getUser";
@@ -47,17 +47,22 @@ const Profile = () => {
                 {/* TOP SECTION */}
                 <div className="flex w-full gap-10 items-center">
                     {/* PROFILE IMAGE */}
-                    <img
-                        src={
-                            data.photoURL?.startsWith(
-                                "https://lh3.googleusercontent.com",
-                            )
-                                ? `${data.photoURL.slice(0, -5)}s300-c`
-                                : data.photoURL || ""
-                        }
-                        alt="Profile"
-                        className="max-w-[155px] rounded-full"
-                    />
+                    <NavLink
+                        to={`/profile?section=overview&id=${profileId || data.id}`}
+                        reloadDocument
+                    >
+                        <img
+                            src={
+                                data.photoURL?.startsWith(
+                                    "https://lh3.googleusercontent.com",
+                                )
+                                    ? `${data.photoURL.slice(0, -5)}s300-c`
+                                    : data.photoURL || ""
+                            }
+                            alt="Profile"
+                            className="max-w-[155px] rounded-full"
+                        />
+                    </NavLink>
 
                     {/* NAME + STATUS */}
                     <div className="flex flex-col gap-3">
