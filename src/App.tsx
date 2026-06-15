@@ -22,6 +22,7 @@ import SignInPage from "./pages/SignInPage";
 import EmailSignUp from "./components/SignUp Page/EmailSignUp";
 import { useQuery } from "@tanstack/react-query";
 import { getUser, type UserT } from "./functions/firebase/getUser";
+import Footer from "./components/Footer";
 
 const App = () => {
     const [isSigned, setIsSigned] = useState<boolean | null>(null);
@@ -41,7 +42,7 @@ const App = () => {
             {isSigned !== null && (
                 <Router>
                     <Navbar />
-                    <div className="max-w-360 w-full px-4 flex items-center">
+                    <div className="max-w-360 w-full px-4 flex items-center flex-col">
                         <Routes>
                             <Route path="/" element={<Home />} />
                             {/* Sign Up Page */}
@@ -92,6 +93,7 @@ const App = () => {
                             <Route path="*" element={<PageNotFound />} />
                         </Routes>
                     </div>
+                    <Footer />
                 </Router>
             )}
         </div>

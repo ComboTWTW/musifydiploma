@@ -46,22 +46,7 @@ const Navbar = () => {
                 <NavLink to={"/"} reloadDocument>
                     <img src={logoMain} alt="Logo" className="max-w-42" />
                 </NavLink>
-                {/* NavbarLinks */}
-                <ul className="text-whiteMain flex text-[16px] font-medium font-poppins gap-9">
-                    {navLinks.map((link, index) => {
-                        return (
-                            <NavLink
-                                to={link.path}
-                                key={link.id}
-                                reloadDocument
-                            >
-                                <li className="hover:underline hover:underline-offset-2 ">
-                                    {link.title}
-                                </li>
-                            </NavLink>
-                        );
-                    })}
-                </ul>
+
                 {/* SearchBar Component and SignIn Buttons*/}
                 <div className="flex gap-9 items-center">
                     <SearchBar />

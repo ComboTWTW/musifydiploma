@@ -5,6 +5,7 @@ import type { topArtistsT } from "../../api/last.fm/getTopArtists";
 import { useQuery } from "@tanstack/react-query";
 import HeroAlbumsGrid from "./HeroAlbumsGrid";
 import { useEffect } from "react";
+import { auth } from "../../config/firebase";
 
 const Hero = () => {
     const {
@@ -17,7 +18,9 @@ const Hero = () => {
         queryFn: getTopArtists,
     });
 
-    const artists = topArtistsData?.artists.artist.slice(5, 9);
+    const artists = topArtistsData?.artists.artist.slice(0, 4);
+
+    const user = auth.currentUser;
 
     useEffect(() => {
         refetch();
@@ -35,11 +38,22 @@ const Hero = () => {
                     {heroText.subHeader}
                 </p>
 
-                <NavLink to={heroText.buttonPath} reloadDocument>
-                    <button className="border-purpleMain max-w-[175px] border bg-purpleMain cursor-pointer rounded-[10px] text-whiteMain font-inter font-light py-3 px-9">
-                        {heroText.buttonText}
-                    </button>
-                </NavLink>
+                {user ? (
+                    <NavLink
+                        to={`/profile?section=overview&id=${user.uid}`}
+                        reloadDocument
+                    >
+                        <button className="border-purpleMain border bg-purpleMain cursor-pointer rounded-[10px] text-whiteMain font-inter font-light py-3 px-9">
+                            Visit Profile Page
+                        </button>
+                    </NavLink>
+                ) : (
+                    <NavLink to={heroText.buttonPath} reloadDocument>
+                        <button className="border-purpleMain  border bg-purpleMain cursor-pointer rounded-[10px] text-whiteMain font-inter font-light py-3 px-9">
+                            {heroText.buttonText}
+                        </button>
+                    </NavLink>
+                )}
             </div>
 
             {/* Albums Covers */}

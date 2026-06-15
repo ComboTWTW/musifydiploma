@@ -3,6 +3,7 @@ import {
     getTopAlbums,
     type ArtistTopAlbumsT,
 } from "../../api/last.fm/artist/getTopAlbums";
+import { NavLink } from "react-router-dom";
 
 interface Props {
     mbid: string;
@@ -22,11 +23,16 @@ const HeroAlbumsGrid = ({ mbid }: Props) => {
     const album = data?.topalbums.album[0];
 
     return (
-        <img
-            src={album?.image[3]["#text"]}
-            alt={album?.name}
-            className="w-full h-full object-cover rounded-md"
-        />
+        <NavLink
+            to={`/album?id=&artist=${album?.artist.name}&album=${album?.name}`}
+            reloadDocument={true}
+        >
+            <img
+                src={album?.image[3]["#text"]}
+                alt={album?.name}
+                className="w-full h-full object-cover rounded-md"
+            />
+        </NavLink>
     );
 };
 
