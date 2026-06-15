@@ -58,7 +58,7 @@ const Profile = () => {
 
         try {
             if (alreadyFollowing) {
-                // ❌ UNFOLLOW
+                // UNFOLLOW
                 await updateDoc(currentUserRef, {
                     following: arrayRemove(data.id),
                 });
@@ -67,12 +67,12 @@ const Profile = () => {
                     followers: arrayRemove(currentUser.uid),
                 });
 
-                // 🔥 instant UI update
+                // instant UI update
                 setFollowers((prev) =>
                     prev.filter((id) => id !== currentUser.uid),
                 );
             } else {
-                // ✅ FOLLOW
+                // FOLLOW
                 await updateDoc(currentUserRef, {
                     following: arrayUnion(data.id),
                 });
@@ -81,7 +81,7 @@ const Profile = () => {
                     followers: arrayUnion(currentUser.uid),
                 });
 
-                // 🔥 instant UI update
+                // instant UI update
                 setFollowers((prev) => [...prev, currentUser.uid]);
             }
 
@@ -109,7 +109,22 @@ const Profile = () => {
             </div>
         );
     }
+    // Private profile protection
+    if (!isOwnProfile && data.profileVisibility === "private") {
+        return (
+            <div className="w-full flex justify-center mt-20">
+                <div className="flex flex-col items-center gap-4">
+                    <h2 className="font-poppins text-4xl font-semibold text-whiteMain">
+                        Private Profile
+                    </h2>
 
+                    <p className="font-poppins text-whiteMain/70 text-center">
+                        This user has restricted access to their profile.
+                    </p>
+                </div>
+            </div>
+        );
+    }
     return (
         <div className="w-full flex flex-col items-center">
             <div className="w-full flex flex-col items-center mt-20">
