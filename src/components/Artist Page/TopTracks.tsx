@@ -35,12 +35,6 @@ const TopTracks = ({ artistTopTracks }: Props) => {
                         );
                     })}
             </ol>
-            <NavLink
-                to="/"
-                className="font-poppins font-medium text-xl underline-offset-4 underline text-whiteMain text-end"
-            >
-                Discover Top Tracks {`>`}
-            </NavLink>
         </div>
     );
 };

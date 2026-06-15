@@ -146,7 +146,7 @@ const Comments = () => {
     if (!user) return null;
 
     return (
-        <div className="flex flex-col gap-6 w-full mt-10">
+        <div className="flex flex-col gap-6 w-full mt-15">
             {/* INPUT */}
             <div className="flex items-start gap-4 w-full bg-[#1F1F27] p-4 rounded-xl">
                 <img

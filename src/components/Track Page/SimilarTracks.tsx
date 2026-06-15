@@ -78,12 +78,6 @@ const SimilarTracks = ({ trackMbid }: Props) => {
                             );
                         })}
                 </ol>
-                <NavLink
-                    to="/"
-                    className="font-poppins font-medium text-xl underline-offset-4 underline text-whiteMain text-end"
-                >
-                    Discover Similar Tracks {`>`}
-                </NavLink>
             </div>
         )
     );

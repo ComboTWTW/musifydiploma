@@ -6,15 +6,16 @@ interface Props {
 }
 
 const TopAlbums = ({ artistTopAlbums }: Props) => {
+    console.log(artistTopAlbums);
     return (
         artistTopAlbums && (
             <div className="flex flex-col gap-4 mt-5 w-full">
                 <h2 className="font-poppins text-2xl font-semibold leading-[120%] text-whiteMain">
-                    Top Albums
+                    Albums
                 </h2>
                 <ul className="flex gap-4">
                     {artistTopAlbums.topalbums.album
-                        .slice(0, 5)
+                        .slice(0, 6)
                         .map((album, index) => {
                             return (
                                 <NavLink
@@ -24,7 +25,7 @@ const TopAlbums = ({ artistTopAlbums }: Props) => {
                                     <li className="flex flex-col gap-3 max-w-[255px]">
                                         <div className="">
                                             <img
-                                                src={`${album.image[3]["#text"]}`}
+                                                src={`${album.image[3]["#text"] === "" ? "https://lastfm.freetls.fastly.net/i/u/300x300/c6f59c1e5e7240a4c0d427abd71f3dbb.jpg" : album.image[3]["#text"]}`}
                                                 alt=""
                                                 className=" "
                                             />
@@ -37,12 +38,6 @@ const TopAlbums = ({ artistTopAlbums }: Props) => {
                             );
                         })}
                 </ul>
-                <NavLink
-                    to="/"
-                    className="font-poppins font-medium text-xl underline-offset-4 underline text-whiteMain text-end"
-                >
-                    Discover All Albums {`>`}
-                </NavLink>
             </div>
         )
     );

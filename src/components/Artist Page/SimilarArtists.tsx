@@ -33,12 +33,6 @@ const SimilarArtists = ({ similarArtists }: Props) => {
                         );
                     })}
             </ul>
-            <NavLink
-                to="/"
-                className="mt-5 font-poppins font-medium text-xl underline-offset-4 underline text-whiteMain text-end"
-            >
-                Discover Similar Artists {`>`}
-            </NavLink>
         </div>
     );
 };
