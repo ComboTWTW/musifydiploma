@@ -50,7 +50,11 @@ const MyLists = ({ userData, isOwnProfile }: Props) => {
         setShowInput(false);
     };
 
-    const displayLists = lists.slice(0, 4);
+    const visibleLists = isOwnProfile
+        ? lists
+        : lists.filter((list) => list.visibility === "public");
+
+    const displayLists = visibleLists.slice(0, 4);
 
     return (
         <div className="flex flex-col gap-5">
@@ -113,7 +117,7 @@ const MyLists = ({ userData, isOwnProfile }: Props) => {
                                     profileId || userData.id
                                 }&listName=${encodeURIComponent(
                                     list.name,
-                                )}&show=artists`}
+                                )}&listId=${list.id}&show=artists`}
                                 className="flex flex-col gap-3"
                                 reloadDocument
                             >
@@ -145,12 +149,14 @@ const MyLists = ({ userData, isOwnProfile }: Props) => {
             </ul>
 
             {/* FOOTER */}
-            <NavLink
-                to={`/profile?section=myLists&id=${profileId || userData.id}`}
-                className="mt-5 font-poppins font-medium text-xl underline text-whiteMain text-end"
-            >
-                View All Lists... {" > "}
-            </NavLink>
+            {visibleLists.length > 0 && (
+                <NavLink
+                    to={`/profile?section=myLists&id=${profileId || userData.id}`}
+                    className="mt-5 font-poppins font-medium text-xl underline text-whiteMain text-end"
+                >
+                    View All Lists... {" > "}
+                </NavLink>
+            )}
         </div>
     );
 };

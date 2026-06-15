@@ -25,9 +25,19 @@ const ListView = ({ userData }: Props) => {
         setLocalLists(userData.lists);
     }, [userData.lists]);
 
+    const listId = searchParams.get("listId");
+
     const currentList = useMemo(() => {
-        return localLists.find((list) => list.name === listName);
-    }, [localLists, listName]);
+        const list = localLists.find((list) => list.id === listId);
+
+        if (!list) return null;
+
+        if (!isOwnProfile && list.visibility !== "public") {
+            return null;
+        }
+
+        return list;
+    }, [localLists, listId, isOwnProfile]);
 
     const filteredItems = useMemo(() => {
         if (!currentList) return [];
@@ -171,9 +181,18 @@ const ListView = ({ userData }: Props) => {
     };
 
     if (!currentList) {
-        return <p className="text-whiteMain">List not found.</p>;
-    }
+        return (
+            <div className="flex flex-col gap-3">
+                <h2 className="font-poppins text-3xl text-whiteMain font-semibold">
+                    List unavailable
+                </h2>
 
+                <p className="text-whiteMain/70 font-poppins">
+                    This list is private or does not exist.
+                </p>
+            </div>
+        );
+    }
     return (
         <div className="flex flex-col gap-5 w-full">
             {/* HEADER */}
@@ -219,10 +238,10 @@ const ListView = ({ userData }: Props) => {
                 {["artists", "albums", "tracks"].map((type) => (
                     <NavLink
                         key={type}
-                        to={buildLink({
+                        to={`${buildLink({
                             listName: listName || "",
                             show: type,
-                        })}
+                        })}&listId=${listId}`}
                         className={`capitalize text-3xl font-poppins hover:text-purpleMain ${
                             show === type
                                 ? "text-purpleMain underline underline-offset-8"

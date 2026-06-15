@@ -6,12 +6,13 @@ import Comments from "../Comments/Comments";
 
 interface Props {
     userData: UserT;
+    isOwnProfile: boolean;
 }
 
-const Overview = ({ userData }: Props) => {
+const Overview = ({ userData, isOwnProfile }: Props) => {
     return (
         <div className="flex flex-col ">
-            <MyLists userData={userData} />
+            <MyLists isOwnProfile={isOwnProfile} userData={userData} />
             <History userData={userData} />
             <Follows userId={userData.id} followType="followers" />
             <Follows userId={userData.id} followType="following" />

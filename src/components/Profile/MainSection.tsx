@@ -19,7 +19,7 @@ const MainSection = ({ userData, isOwnProfile }: Props) => {
     return (
         <div className="flex flex-col w-full">
             {(sectionParam === null || sectionParam === "overview") && (
-                <Overview userData={userData} />
+                <Overview isOwnProfile={isOwnProfile} userData={userData} />
             )}
 
             {sectionParam === "myLists" && (
