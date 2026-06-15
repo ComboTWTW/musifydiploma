@@ -26,41 +26,52 @@ const Hero = () => {
         refetch();
     }, []);
     return (
-        <div className="flex justify-between">
+        <div className="flex flex-col-reverse lg:flex-row items-center lg:items-start justify-between gap-10 lg:gap-16">
             {/* Hero Text */}
-            <div className="flex flex-col gap-7 max-w-[450px]">
-                <h1 className="font-poppins font-semibold text-5xl leading-[120%] text-whiteMain line-clamp-3">
+            <div className="flex flex-col gap-6 md:gap-7 w-full lg:max-w-[450px] text-center lg:text-left">
+                <h1 className="font-poppins font-semibold text-3xl sm:text-4xl md:text-5xl leading-[120%] text-whiteMain line-clamp-3">
                     Your <span className="text-purpleMain">personal</span> music
                     encyclopedia
                 </h1>
 
-                <p className="font-poppins text-whiteMain font-medium leading-[170%] text-xl">
+                <p className="font-poppins text-whiteMain font-medium leading-[170%] text-base sm:text-lg md:text-[20px] lg:text-xl opacity-90">
                     {heroText.subHeader}
                 </p>
 
-                {user ? (
-                    <NavLink
-                        to={`/profile?section=overview&id=${user.uid}`}
-                        reloadDocument
-                    >
-                        <button className="border-purpleMain border bg-purpleMain cursor-pointer rounded-[10px] text-whiteMain font-inter font-light py-3 px-9">
-                            Visit Profile Page
-                        </button>
-                    </NavLink>
-                ) : (
-                    <NavLink to={heroText.buttonPath} reloadDocument>
-                        <button className="border-purpleMain  border bg-purpleMain cursor-pointer rounded-[10px] text-whiteMain font-inter font-light py-3 px-9">
-                            {heroText.buttonText}
-                        </button>
-                    </NavLink>
-                )}
+                {/* Button wrapper */}
+                <div className="flex justify-center lg:justify-start">
+                    {user ? (
+                        <NavLink
+                            to={`/profile?section=overview&id=${user.uid}`}
+                            reloadDocument
+                        >
+                            <button className="w-full sm:w-auto border border-purpleMain bg-purpleMain cursor-pointer rounded-[10px] text-whiteMain font-inter font-light py-3 px-8 sm:px-9 hover:opacity-90 transition">
+                                Visit Profile Page
+                            </button>
+                        </NavLink>
+                    ) : (
+                        <NavLink to={heroText.buttonPath} reloadDocument>
+                            <button className="w-full sm:w-auto border border-purpleMain bg-purpleMain cursor-pointer rounded-[10px] text-whiteMain font-inter font-light py-3 px-8 sm:px-9 hover:opacity-90 transition">
+                                {heroText.buttonText}
+                            </button>
+                        </NavLink>
+                    )}
+                </div>
             </div>
 
             {/* Albums Covers */}
-            <div className="grid grid-cols-2 grid-rows-2 gap-4">
-                {isLoading && <p className="text-white">Loading...</p>}
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 gap-3 sm:gap-4 w-full lg:max-w-[50%]">
+                {isLoading && (
+                    <p className="text-whiteMain col-span-2 text-center">
+                        Loading...
+                    </p>
+                )}
 
-                {error && <p className="text-red-500">Error loading artists</p>}
+                {error && (
+                    <p className="text-red-500 col-span-2 text-center">
+                        Error loading artists
+                    </p>
+                )}
 
                 {artists?.map((artist) => (
                     <HeroAlbumsGrid
