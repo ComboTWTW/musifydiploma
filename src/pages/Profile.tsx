@@ -12,6 +12,7 @@ import {
     arrayRemove,
     getDoc,
 } from "firebase/firestore";
+import EmailIcon from "@mui/icons-material/Email";
 
 const Profile = () => {
     const [searchParams] = useSearchParams();
@@ -109,6 +110,16 @@ const Profile = () => {
             </div>
         );
     }
+
+    const handleEmailUser = () => {
+        if (!data?.email) return;
+
+        const subject = encodeURIComponent("Message from Music Encyclopedia");
+
+        const body = encodeURIComponent(`Hello ${data.name},\n\n`);
+
+        window.location.href = `mailto:${data.email}?subject=${subject}&body=${body}`;
+    };
     // Private profile protection
     if (!isOwnProfile && data.profileVisibility === "private") {
         return (
@@ -146,11 +157,25 @@ const Profile = () => {
                             className="max-w-[155px] rounded-full"
                         />
                     </NavLink>
-
+                    {/* Profile Name and Status */}
                     <div className="flex flex-col gap-3">
-                        <h2 className="font-poppins text-4xl font-semibold text-whiteMain">
-                            {data.name}
-                        </h2>
+                        <div className="flex gap-8 items-center">
+                            <h2 className="font-poppins text-4xl font-semibold text-whiteMain">
+                                {data.name}
+                            </h2>
+                            {!isOwnProfile && (
+                                <button
+                                    onClick={handleEmailUser}
+                                    title="Send email"
+                                    className="hover:opacity-80 transition cursor-pointer"
+                                >
+                                    <EmailIcon
+                                        sx={{ color: "white" }}
+                                        fontSize="large"
+                                    />
+                                </button>
+                            )}
+                        </div>
 
                         {data.status && (
                             <h3 className="font-poppins text-whiteMain">
