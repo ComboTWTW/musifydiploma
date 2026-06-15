@@ -30,7 +30,7 @@ const SearchBar = () => {
                 p: "2px 4px",
                 display: "flex",
                 alignItems: "center",
-                width: 280,
+                width: 230,
                 height: 32,
                 borderRadius: "8px",
                 backgroundColor: "#2A2A35",

@@ -44,19 +44,26 @@ const Navbar = () => {
             <div className="max-w-360 w-full flex items-center justify-between px-4">
                 {/* Logo */}
                 <NavLink to={"/"} reloadDocument>
-                    <img src={logoMain} alt="Logo" className="max-w-42" />
+                    <img
+                        src={logoMain}
+                        alt="Logo"
+                        className="sm:max-w-30 md:max-w-42"
+                    />
                 </NavLink>
 
                 {/* SearchBar Component and SignIn Buttons*/}
                 <div className="flex gap-9 items-center">
-                    <SearchBar />
+                    <div className="hidden md:block">
+                        <SearchBar />
+                    </div>
                     {user === null ? (
+                        // Sign IN/UP buttons
                         <ul className="flex gap-3">
                             {navbarButtons.map((button, index) => {
                                 return (
                                     <NavLink to={button.path} reloadDocument>
                                         <li
-                                            className={`border-purpleMain border border-solid ${button.id === "signup" ? "bg-purpleMain" : "bg-border"} rounded-[10px] text-whiteMain font-inter font-light py-2.5 px-9 `}
+                                            className={`border-purpleMain border border-solid ${button.id === "signup" ? "bg-purpleMain" : "bg-border"} rounded-[10px] text-whiteMain font-inter font-light md:py-2.5 md:px-9 py-2 px-4`}
                                         >
                                             {button.title}
                                         </li>
@@ -78,6 +85,9 @@ const Navbar = () => {
                         </NavLink>
                     )}
                 </div>
+            </div>
+            <div className="mt-3 md:hidden">
+                <SearchBar />
             </div>
         </nav>
     );
