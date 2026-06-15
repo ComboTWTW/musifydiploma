@@ -121,15 +121,9 @@ const TrackPage = () => {
                                 {currentTrackInfo.track.toptags.tag
                                     .slice(0, 5)
                                     .map((tag) => (
-                                        <NavLink
-                                            key={tag.name}
-                                            to="/"
-                                            reloadDocument
-                                        >
-                                            <span className="text-whiteMain uppercase font-inter hover:text-purpleMain">
-                                                {tag.name}
-                                            </span>
-                                        </NavLink>
+                                        <span className="text-whiteMain uppercase font-inter hover:text-purpleMain">
+                                            {tag.name}
+                                        </span>
                                     ))}
                             </ul>
                         </div>

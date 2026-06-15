@@ -64,16 +64,14 @@ const AlbumPage = () => {
                                 .slice(0, 5)
                                 .map((tag, index) => {
                                     return (
-                                        <NavLink to={"/"} reloadDocument>
-                                            <span className="text-whiteMain uppercase font-inter hover:text-purpleMain">
-                                                {tag.name}{" "}
-                                                <span
-                                                    className={`text-whiteMain ml-2 ${index === 4 && "hidden"}`}
-                                                >
-                                                    •
-                                                </span>
+                                        <span className="text-whiteMain uppercase font-inter hover:text-purpleMain">
+                                            {tag.name}{" "}
+                                            <span
+                                                className={`text-whiteMain ml-2 ${index === 4 && "hidden"}`}
+                                            >
+                                                •
                                             </span>
-                                        </NavLink>
+                                        </span>
                                     );
                                 })}
                         </ul>{" "}

@@ -106,11 +106,9 @@ const Artist = () => {
                                 .slice(0, 5)
                                 .map((tag, index) => {
                                     return (
-                                        <NavLink to={"/"} reloadDocument>
-                                            <span className="text-whiteMain uppercase font-inter hover:text-purpleMain">
-                                                {tag.name}
-                                            </span>
-                                        </NavLink>
+                                        <span className="text-whiteMain uppercase font-inter hover:text-purpleMain">
+                                            {tag.name}
+                                        </span>
                                     );
                                 })}
                         </ul>
