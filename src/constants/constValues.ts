@@ -54,10 +54,6 @@ export const profileSideBarLinks: { title: string; linkTo: string }[] = [
         linkTo: "history",
     },
     {
-        title: "favorites",
-        linkTo: "favorites",
-    },
-    {
         title: "followers",
         linkTo: "followers",
     },
